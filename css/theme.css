@@ -1,0 +1,71 @@
+﻿/* css/theme.css - Calm, distraction-free Light & Dark themes */
+
+:root, [data-theme="light"] {
+  --color-bg-app: #f7f9fa;
+  --color-bg-surface: #ffffff;
+  --color-bg-surface-hover: #f1f4f6;
+  --color-bg-sidebar: #edf2f5;
+  --color-bg-sidebar-active: #ffffff;
+  --color-bg-subtle: #f8fafb;
+  --color-bg-card: #ffffff;
+
+  --color-text-main: #1e293b;
+  --color-text-muted: #64748b;
+  --color-text-subtle: #94a3b8;
+  --color-text-inverse: #ffffff;
+
+  --color-border: #e2e8f0;
+  --color-border-subtle: #cbd5e1;
+  --color-border-strong: #94a3b8;
+
+  --color-primary: #0284c7;
+  --color-primary-hover: #0369a1;
+  --color-primary-subtle: #e0f2fe;
+  --color-primary-text: #0369a1;
+
+  --color-success: #16a34a;
+  --color-success-subtle: #dcfce7;
+  --color-warning: #d97706;
+  --color-warning-subtle: #fef3c7;
+  --color-danger: #dc2626;
+  --color-danger-subtle: #fee2e2;
+
+  --color-banner-bg: #eff6ff;
+  --color-banner-border: #bfdbfe;
+  --color-banner-text: #1e40af;
+}
+
+[data-theme="dark"] {
+  --color-bg-app: #0f172a;
+  --color-bg-surface: #1e293b;
+  --color-bg-surface-hover: #334155;
+  --color-bg-sidebar: #141e33;
+  --color-bg-sidebar-active: #1e293b;
+  --color-bg-subtle: #182234;
+  --color-bg-card: #1e293b;
+
+  --color-text-main: #f1f5f9;
+  --color-text-muted: #94a3b8;
+  --color-text-subtle: #64748b;
+  --color-text-inverse: #0f172a;
+
+  --color-border: #334155;
+  --color-border-subtle: #475569;
+  --color-border-strong: #64748b;
+
+  --color-primary: #38bdf8;
+  --color-primary-hover: #7dd3fc;
+  --color-primary-subtle: rgba(56, 189, 248, 0.15);
+  --color-primary-text: #38bdf8;
+
+  --color-success: #22c55e;
+  --color-success-subtle: rgba(34, 197, 94, 0.15);
+  --color-warning: #f59e0b;
+  --color-warning-subtle: rgba(245, 158, 11, 0.15);
+  --color-danger: #ef4444;
+  --color-danger-subtle: rgba(239, 68, 68, 0.15);
+
+  --color-banner-bg: #1e293b;
+  --color-banner-border: #38bdf8;
+  --color-banner-text: #e0f2fe;
+}

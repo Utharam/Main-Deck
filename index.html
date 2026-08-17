@@ -1,0 +1,155 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1024, initial-scale=1.0">
+  <title>Main Deck by Utharam — Personal Control Surface</title>
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <!-- Mobile / Small Screen Notice Overlay -->
+  <div id="mobile-screen-notice" class="mobile-notice-overlay" style="display: none;">
+    <div class="mobile-notice-card card">
+      <div style="font-size: 2.5rem; margin-bottom: 8px;">🖥️</div>
+      <h2 style="font-size: 1.25rem;">Desktop Experience Intended</h2>
+      <p style="font-size: 0.875rem; color: var(--color-text-muted); margin: 8px 0 16px; line-height: 1.5;">
+        <strong>Main Deck</strong> is built specifically for corporate desktop and laptop browsers (ThinkPads, Macs, and PCs). For the intended control surface experience, please open this page on your desktop computer.
+      </p>
+      <button id="btn-dismiss-mobile-notice" class="btn btn-sm btn-secondary" style="width: 100%;">Continue Anyway</button>
+    </div>
+  </div>
+
+  <div class="app-root">
+    <!-- Top Alert Banner (Backups, Notifications) -->
+    <aside id="app-banner" class="app-banner" role="alert">
+      <div class="banner-content"></div>
+      <div class="banner-actions">
+        <button class="btn btn-xs btn-primary banner-action-btn"></button>
+        <button class="btn btn-xs btn-ghost banner-dismiss-btn" title="Dismiss">✕</button>
+      </div>
+    </aside>
+
+    <!-- App Header -->
+    <header class="app-header">
+      <div class="header-brand">
+        <span style="font-size: 1.25rem;">⚓</span>
+        <div style="display: flex; align-items: baseline; gap: 6px;">
+          <span class="brand-title">Main Deck</span>
+          <span style="font-size: var(--font-size-xs); color: var(--color-text-muted); font-weight: 500;">by Utharam</span>
+        </div>
+        <span class="brand-badge">Local-First</span>
+      </div>
+
+      <!-- Header Actions: Read Me, Search, Weather, Live Clock -->
+      <div class="header-actions">
+        <!-- Read Me / Help Guide Button -->
+        <button id="header-readme-btn" class="btn btn-xs btn-secondary" title="Main Deck Guide & Philosophy">
+          📖 Read Me
+        </button>
+
+        <button id="header-search-btn" class="btn btn-xs btn-secondary" title="Search Main Deck (Ctrl+K)">
+          🔍 Search <kbd style="font-size: 10px; opacity: 0.7; background: var(--color-bg-app); padding: 1px 4px; border-radius: 3px; margin-left: 4px;">Ctrl+K</kbd>
+        </button>
+
+        <!-- Weather Widget in Header -->
+        <div id="header-weather" class="header-weather-dock">
+          <!-- Injected via weather.js -->
+        </div>
+
+        <span id="header-clock" class="header-clock">--:--</span>
+      </div>
+    </header>
+
+    <!-- Main Two-Column Layout -->
+    <main class="app-main">
+      <!-- Left Navigation Sidebar -->
+      <nav class="app-sidebar" aria-label="Main Navigation">
+        <div class="nav-group">
+          <div class="nav-label">Workspace</div>
+          <a href="#home" class="nav-item active">
+            <span class="nav-icon">🏠</span>
+            <span>Home</span>
+          </a>
+          <a href="#projects" class="nav-item">
+            <span class="nav-icon">📋</span>
+            <span>Projects & Tasks</span>
+          </a>
+          <a href="#phases" class="nav-item">
+            <span class="nav-icon">🧩</span>
+            <span>Phases</span>
+          </a>
+          <a href="#notes" class="nav-item">
+            <span class="nav-icon">📝</span>
+            <span>Notes</span>
+          </a>
+          <a href="#sop" class="nav-item">
+            <span class="nav-icon">📚</span>
+            <span>SOP</span>
+          </a>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-label">Rest & Reset</div>
+          <a href="#stressbuster" class="nav-item">
+            <span class="nav-icon">🧠</span>
+            <span>Stress Buster</span>
+          </a>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-label">System</div>
+          <a href="#settings" class="nav-item">
+            <span class="nav-icon">⚙️</span>
+            <span>Settings</span>
+          </a>
+        </div>
+      </nav>
+
+      <!-- Center Dynamic Viewport -->
+      <section id="app-content" class="app-content" aria-live="polite">
+        <!-- Injected via Router -->
+      </section>
+
+      <!-- Right Attention & Widgets Column -->
+      <aside id="app-widgets" class="app-widgets" aria-label="Widgets">
+        <!-- Injected via Widget Registry (Tasks, Calls, Emails, Meetings, Reminders, Days Since) -->
+      </aside>
+    </main>
+
+    <!-- Bottom Human Encouragement & Stress Meter Dock -->
+    <footer class="app-footer">
+      <div id="footer-quote-text" class="footer-quote" style="flex: 1; max-width: 32%;">
+        💬 "One thing at a time."
+      </div>
+
+      <!-- Stress Meter Centered in Footer -->
+      <div id="footer-stress-meter" class="footer-stress-dock" style="flex: 1; display: flex; justify-content: center;">
+        <!-- Injected via stress.js -->
+      </div>
+
+      <!-- Custom Attribution in Footer with Facebook Blue link -->
+      <div class="footer-meta" style="flex: 1; display: flex; justify-content: flex-end; align-items: center; gap: 6px; font-size: 11px;">
+        <span>Created by</span>
+        <a href="https://utharam.github.io/" target="_blank" rel="noopener" style="color: #1877F2; font-weight: 700; text-decoration: none;" title="Visit Utharam on GitHub">
+          Utharam
+        </a>
+        <span style="opacity: 0.5;">·</span>
+        <span>Desktop only</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Reusable Modal Window Container -->
+  <div id="modal-overlay" class="modal-overlay" role="dialog" aria-modal="true">
+    <div id="modal-window" class="modal-window"></div>
+  </div>
+
+  <!-- App Bootstrap -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
