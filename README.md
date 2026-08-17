@@ -53,12 +53,6 @@ npx serve .
 python -m http.server 8000
 ```
 
-### GitHub Pages Deployment:
-1. Push this repository to GitHub.
-2. Go to **Repository Settings** ➔ **Pages**.
-3. Under **Build and deployment**, set Source to **Deploy from a branch** (`main` / root `/`).
-4. Save! Your site will be live at `https://<your-username>.github.io/<repo-name>/`.
-
 ---
 
 ## 👤 Author
