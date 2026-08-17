@@ -1,4 +1,4 @@
-﻿/**
+/**
  * js/widgets/weather.js - Weather Widget (Header Dock with Assisted Location)
  */
 
@@ -11,20 +11,19 @@ let cachedSettingsKey = '';
 
 // Built-in Timezone / GMT offset coordinate dictionary
 const TIMEZONE_COORDINATES = {
-  'Asia/Karachi': { lat: 24.86, lon: 67.00, name: 'Karachi' },
+  'America/New_York': { lat: 40.71, lon: -74.00, name: 'New York' },
+  'America/Los_Angeles': { lat: 34.05, lon: -118.24, name: 'Los Angeles' },
+  'Europe/London': { lat: 51.50, lon: -0.12, name: 'London' },
+  'Europe/Paris': { lat: 48.85, lon: 2.35, name: 'Paris' },
+  'Asia/Dubai': { lat: 25.20, lon: 55.27, name: 'Dubai' },
   'Asia/Calcutta': { lat: 28.61, lon: 77.20, name: 'New Delhi' },
   'Asia/Kolkata': { lat: 28.61, lon: 77.20, name: 'New Delhi' },
   'Asia/Colombo': { lat: 6.92, lon: 79.86, name: 'Colombo' },
   'Asia/Dhaka': { lat: 23.81, lon: 90.41, name: 'Dhaka' },
-  'Asia/Dubai': { lat: 25.20, lon: 55.27, name: 'Dubai' },
   'Asia/Riyadh': { lat: 24.71, lon: 46.67, name: 'Riyadh' },
   'Asia/Singapore': { lat: 1.35, lon: 103.82, name: 'Singapore' },
   'Asia/Hong_Kong': { lat: 22.31, lon: 114.16, name: 'Hong Kong' },
-  'Asia/Tokyo': { lat: 35.67, lon: 139.65, name: 'Tokyo' },
-  'Europe/London': { lat: 51.50, lon: -0.12, name: 'London' },
-  'Europe/Paris': { lat: 48.85, lon: 2.35, name: 'Paris' },
-  'America/New_York': { lat: 40.71, lon: -74.00, name: 'New York' },
-  'America/Los_Angeles': { lat: 34.05, lon: -118.24, name: 'Los Angeles' }
+  'Asia/Tokyo': { lat: 35.67, lon: 139.65, name: 'Tokyo' }
 };
 
 export const widget = {
@@ -48,7 +47,7 @@ export const widget = {
       }
     }
 
-    const data = weather || { temp: 24, condition: 'Clear', emoji: '☀️', location: settings.weatherCity || 'Local' };
+    const data = weather || { temp: 22, condition: 'Clear', emoji: '☀️', location: settings.weatherCity || 'New York' };
 
     container.innerHTML = `
       <a href="#settings" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: var(--color-text-main);" title="Location: ${escapeHtml(data.location)} (${data.condition}). Click to configure in Settings">
@@ -75,18 +74,17 @@ export function resolveLocation(settings = {}) {
   }
 
   const offsetMinutes = -new Date().getTimezoneOffset();
-  if (offsetMinutes === 300) return { lat: 24.86, lon: 67.00, name: 'Karachi' };
-  if (offsetMinutes === 330) return { lat: 28.61, lon: 77.20, name: 'New Delhi' };
-  if (offsetMinutes === 240) return { lat: 25.20, lon: 55.27, name: 'Dubai' };
-  if (offsetMinutes === 180) return { lat: 24.71, lon: 46.67, name: 'Riyadh' };
-  if (offsetMinutes === 480) return { lat: 1.35, lon: 103.82, name: 'Singapore' };
-  if (offsetMinutes === 60) return { lat: 48.85, lon: 2.35, name: 'Paris' };
-  if (offsetMinutes === 0) return { lat: 51.50, lon: -0.12, name: 'London' };
   if (offsetMinutes === -300) return { lat: 40.71, lon: -74.00, name: 'New York' };
   if (offsetMinutes === -480) return { lat: 34.05, lon: -118.24, name: 'Los Angeles' };
+  if (offsetMinutes === 0) return { lat: 51.50, lon: -0.12, name: 'London' };
+  if (offsetMinutes === 60) return { lat: 48.85, lon: 2.35, name: 'Paris' };
+  if (offsetMinutes === 240) return { lat: 25.20, lon: 55.27, name: 'Dubai' };
+  if (offsetMinutes === 330) return { lat: 28.61, lon: 77.20, name: 'New Delhi' };
+  if (offsetMinutes === 480) return { lat: 1.35, lon: 103.82, name: 'Singapore' };
 
-  return { lat: 24.86, lon: 67.00, name: 'Local' };
+  return { lat: 40.71, lon: -74.00, name: 'New York' };
 }
+
 
 async function fetchWeatherSafe(settings = {}) {
   try {

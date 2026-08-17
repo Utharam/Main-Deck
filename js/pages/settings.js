@@ -1,4 +1,4 @@
-﻿/**
+/**
  * js/pages/settings.js - Settings, Location & Custom Quotes View (Main Deck)
  */
 
@@ -10,19 +10,19 @@ import { renderAllWidgets } from '../app.js';
 
 const LOCATION_PRESETS = [
   { label: 'Auto-detect from System Timezone / Geolocation', city: '', lat: '', lon: '' },
-  { label: 'GMT+5:00 — Karachi / Islamabad (Pakistan)', city: 'Karachi', lat: '24.86', lon: '67.00' },
-  { label: 'GMT+5:30 — New Delhi / Mumbai (India)', city: 'New Delhi', lat: '28.61', lon: '77.20' },
+  { label: 'GMT-5:00 — New York / Toronto / Eastern US', city: 'New York', lat: '40.71', lon: '-74.00' },
+  { label: 'GMT+0:00 — London (UK)', city: 'London', lat: '51.50', lon: '-0.12' },
+  { label: 'GMT+1:00 — Paris / Berlin / Amsterdam', city: 'Paris', lat: '48.85', lon: '2.35' },
   { label: 'GMT+4:00 — Dubai / Abu Dhabi (UAE)', city: 'Dubai', lat: '25.20', lon: '55.27' },
+  { label: 'GMT+5:30 — New Delhi / Mumbai (India)', city: 'New Delhi', lat: '28.61', lon: '77.20' },
   { label: 'GMT+3:00 — Riyadh / Doha / Kuwait', city: 'Riyadh', lat: '24.71', lon: '46.67' },
   { label: 'GMT+6:00 — Dhaka / Almaty', city: 'Dhaka', lat: '23.81', lon: '90.41' },
   { label: 'GMT+8:00 — Singapore / Hong Kong / Beijing', city: 'Singapore', lat: '1.35', lon: '103.82' },
   { label: 'GMT+9:00 — Tokyo / Seoul', city: 'Tokyo', lat: '35.67', lon: '139.65' },
-  { label: 'GMT+0:00 — London (UK)', city: 'London', lat: '51.50', lon: '-0.12' },
-  { label: 'GMT+1:00 — Paris / Berlin / Amsterdam', city: 'Paris', lat: '48.85', lon: '2.35' },
-  { label: 'GMT-5:00 — New York / Toronto / Eastern US', city: 'New York', lat: '40.71', lon: '-74.00' },
   { label: 'GMT-6:00 — Chicago / Central US', city: 'Chicago', lat: '41.87', lon: '-87.62' },
   { label: 'GMT-8:00 — Los Angeles / San Francisco / Pacific', city: 'San Francisco', lat: '37.77', lon: '-122.41' }
 ];
+
 
 export async function render(container) {
   const settings = await store.getAllSettings();
@@ -95,8 +95,9 @@ export async function render(container) {
           <div class="form-row">
             <div class="form-group">
               <label class="form-label" for="setting-weather-city">City Name (Display)</label>
-              <input type="text" id="setting-weather-city" value="${escapeHtml(settings.weatherCity || '')}" placeholder="e.g. Karachi / Mumbai / Dubai" />
+              <input type="text" id="setting-weather-city" value="${escapeHtml(settings.weatherCity || '')}" placeholder="e.g. New York / London / Dubai" />
             </div>
+
 
             <div class="form-group">
               <label class="form-label" for="setting-weather-lat">Latitude (Optional)</label>
