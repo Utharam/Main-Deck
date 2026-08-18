@@ -1,4 +1,4 @@
-﻿/* css/components.css - UI Components (Cards, Buttons, Modals, Badges, Sliders) */
+/* css/components.css - UI Components (Cards, Buttons, Modals, Badges, Sliders) */
 
 /* Buttons */
 .btn {
@@ -11,32 +11,35 @@
   font-weight: var(--font-weight-medium);
   border-radius: var(--radius-md);
   border: 1px solid transparent;
-  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform 100ms ease, box-shadow var(--transition-fast);
   user-select: none;
 }
 
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 .btn-primary {
   background-color: var(--color-primary);
   color: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .btn-primary:hover:not(:disabled) {
   background-color: var(--color-primary-hover);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .btn-secondary {
   background-color: var(--color-bg-surface);
   border-color: var(--color-border);
   color: var(--color-text-main);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-secondary:hover:not(:disabled) {
   background-color: var(--color-bg-surface-hover);
+  border-color: var(--color-border-subtle);
 }
 
 .btn-ghost {
@@ -76,11 +79,16 @@
   align-items: center;
   justify-content: center;
   color: var(--color-text-muted);
+  transition: background-color var(--transition-fast), color var(--transition-fast), transform 100ms ease;
 }
 
 .btn-icon:hover {
   background-color: var(--color-bg-surface-hover);
   color: var(--color-text-main);
+}
+
+.btn-icon:active {
+  transform: scale(0.92);
 }
 
 /* Cards */
@@ -93,6 +101,12 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.card:hover {
+  border-color: var(--color-border-subtle);
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05);
 }
 
 .card-header {
@@ -117,11 +131,12 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: border-color var(--transition-fast);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
 }
 
 .widget-card:hover {
   border-color: var(--color-border-subtle);
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.04);
 }
 
 .widget-header {
@@ -365,4 +380,99 @@
 .kv-value {
   font-weight: var(--font-weight-medium);
   color: var(--color-text-main);
+}
+
+/* Keyboard Shortcut Key Caps (Linear / Raycast Style) */
+kbd {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  padding: 2px 5px;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-surface);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.08);
+}
+
+/* View Entrance Animation */
+@keyframes fadeInView {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.app-content > * {
+  animation: fadeInView 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Quick Pending Pills Bar (Home Page Widget Shortcut Strip) */
+.pending-pills-bar {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  flex-wrap: wrap;
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.pending-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background-color: var(--color-bg-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+  user-select: none;
+}
+
+.pending-pill:hover {
+  background-color: var(--color-bg-surface-hover);
+  border-color: var(--color-primary);
+  color: var(--color-text-main);
+  transform: translateY(-1px);
+}
+
+.pending-pill-count {
+  font-weight: var(--font-weight-bold);
+  padding: 1px 7px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+}
+
+.pending-pill-count.has-items {
+  background-color: var(--color-primary-subtle);
+  color: var(--color-primary-text);
+}
+
+.pending-pill-count.zero-items {
+  background-color: var(--color-bg-surface-hover);
+  color: var(--color-text-subtle);
+}
+
+@keyframes widgetGlow {
+  0% { box-shadow: 0 0 0 3px var(--color-primary); }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+.widget-slot-glow {
+  animation: widgetGlow 1.2s ease-out;
+  border-radius: var(--radius-lg);
 }

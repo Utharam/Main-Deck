@@ -70,6 +70,7 @@ const DEFAULT_SETTINGS = {
   timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
   workingDays: [1, 2, 3, 4, 5],
   theme: 'light',
+  quirk: 'auto',
   stressScore: 20
 };
 

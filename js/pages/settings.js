@@ -6,7 +6,7 @@ import * as store from '../store.js';
 import { escapeHtml } from '../ui.js';
 import { exportFullBackup } from '../utils/export.js';
 import { readJsonFile, handleImport } from '../utils/import.js';
-import { renderAllWidgets } from '../app.js';
+import { renderAllWidgets, QUIRK_LIST, applyQuirk } from '../app.js';
 
 const LOCATION_PRESETS = [
   { label: 'Auto-detect from System Timezone / Geolocation', city: '', lat: '', lon: '' },
@@ -30,18 +30,19 @@ export async function render(container) {
   const metaLastBackup = await store.getMeta('lastBackupAt');
   const allMessages = await store.getMessages();
 
-  // Find user-added custom quotes (or display all)
+  // Find user-added custom quotes
   const customMessages = allMessages.filter(m => m.isCustom || !m.id.startsWith('msg-'));
 
   container.innerHTML = `
     <div class="page-container">
-      <!-- 1. Preferences & Profile Card -->
+
+      <!-- SECTION 1: ⚙️ Preferences & Profile -->
       <div class="card">
         <div class="card-header">
           <h2 class="card-title">⚙️ Preferences & Profile</h2>
         </div>
         
-        <form id="settings-form" style="display: flex; flex-direction: column; gap: var(--space-4);">
+        <form id="form-preferences" style="display: flex; flex-direction: column; gap: var(--space-4);">
           <div class="form-group">
             <label class="form-label" for="setting-name">Your Name</label>
             <input type="text" id="setting-name" value="${escapeHtml(settings.userName || '')}" placeholder="e.g. Alex" />
@@ -73,14 +74,30 @@ export async function render(container) {
                 <option value="dark" ${settings.theme === 'dark' ? 'selected' : ''}>Focused Dark</option>
               </select>
             </div>
+
+            <div class="form-group">
+              <label class="form-label" for="setting-quirk">Daily Quirk Accent</label>
+              <select id="setting-quirk">
+                <option value="auto" ${(settings.quirk || 'auto') === 'auto' ? 'selected' : ''}>🎲 Auto (changes daily)</option>
+                ${QUIRK_LIST.map(q => `<option value="${escapeHtml(q.slug)}" ${settings.quirk === q.slug ? 'selected' : ''}>${escapeHtml(q.name)}</option>`).join('')}
+              </select>
+              <span class="form-help">Subtle daily accent mood.</span>
+            </div>
           </div>
 
-          <hr style="border: 0; border-top: 1px solid var(--color-border); margin: var(--space-2) 0;" />
-
-          <div class="card-header" style="border: none; padding: 0;">
-            <h3 class="card-title" style="font-size: var(--font-size-md);">🌦️ Weather Location & Coordinates</h3>
+          <div style="display: flex; justify-content: flex-end; margin-top: var(--space-2);">
+            <button type="submit" class="btn btn-primary">Save Profile & Appearance</button>
           </div>
+        </form>
+      </div>
 
+      <!-- SECTION 2: 🌦️ Weather Location & Coordinates -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">🌦️ Weather Location & Coordinates</h2>
+        </div>
+
+        <form id="form-weather" style="display: flex; flex-direction: column; gap: var(--space-4);">
           <div class="form-group">
             <label class="form-label" for="setting-location-preset">Assisted Location / GMT Offset Preset</label>
             <select id="setting-location-preset">
@@ -89,7 +106,7 @@ export async function render(container) {
                 return `<option value="${escapeHtml(JSON.stringify(p))}" ${isSelected ? 'selected' : ''}>${escapeHtml(p.label)}</option>`;
               }).join('')}
             </select>
-            <span class="form-help">Select your general region or enter a custom city / coordinates below.</span>
+            <span class="form-help">Select your region or enter custom coordinates below.</span>
           </div>
 
           <div class="form-row">
@@ -97,7 +114,6 @@ export async function render(container) {
               <label class="form-label" for="setting-weather-city">City Name (Display)</label>
               <input type="text" id="setting-weather-city" value="${escapeHtml(settings.weatherCity || '')}" placeholder="e.g. New York / London / Dubai" />
             </div>
-
 
             <div class="form-group">
               <label class="form-label" for="setting-weather-lat">Latitude (Optional)</label>
@@ -111,12 +127,12 @@ export async function render(container) {
           </div>
 
           <div style="display: flex; justify-content: flex-end; margin-top: var(--space-2);">
-            <button type="submit" class="btn btn-primary">Save Preferences</button>
+            <button type="submit" class="btn btn-primary">Save Location</button>
           </div>
         </form>
       </div>
 
-      <!-- 2. Custom Quotes & Encouragements Card -->
+      <!-- SECTION 3: 💬 Custom Quotes & Daily Encouragements -->
       <div class="card">
         <div class="card-header">
           <div>
@@ -160,7 +176,7 @@ export async function render(container) {
         </div>
       </div>
 
-      <!-- 3. Local Storage, Portability & Backups Card -->
+      <!-- SECTION 4: 💾 Local Storage & Portability -->
       <div class="card">
         <div class="card-header">
           <h3 class="card-title">💾 Local Storage & Portability</h3>
@@ -189,10 +205,48 @@ export async function render(container) {
           </label>
         </div>
       </div>
+
     </div>
   `;
 
-  // Preset selection auto-fills city, lat, lon
+  // --- Handlers for SECTION 1: Preferences & Profile ---
+  const formPref = container.querySelector('#form-preferences');
+  if (formPref) {
+    formPref.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const userName = container.querySelector('#setting-name').value.trim() || 'User';
+      const workStart = container.querySelector('#setting-work-start').value || '09:00';
+      const workEnd = container.querySelector('#setting-work-end').value || '18:00';
+      const timezone = container.querySelector('#setting-timezone').value.trim() || 'UTC';
+      const theme = container.querySelector('#setting-theme').value;
+      const quirk = container.querySelector('#setting-quirk').value;
+
+      await store.setSetting('userName', userName);
+      await store.setSetting('workStart', workStart);
+      await store.setSetting('workEnd', workEnd);
+      await store.setSetting('timezone', timezone);
+      await store.setSetting('theme', theme);
+      await store.setSetting('quirk', quirk);
+
+      document.documentElement.setAttribute('data-theme', theme);
+
+      // Apply quirk immediately
+      if (quirk === 'auto') {
+        const now = new Date();
+        const start = new Date(now.getFullYear(), 0, 0);
+        const dayOfYear = Math.floor((now - start) / (1000 * 60 * 60 * 24));
+        const autoSlug = QUIRK_LIST[dayOfYear % QUIRK_LIST.length].slug;
+        applyQuirk(autoSlug);
+      } else {
+        applyQuirk(quirk);
+      }
+
+      await renderAllWidgets();
+      alert('Preferences & Profile saved successfully!');
+    });
+  }
+
+  // --- Handlers for SECTION 2: Weather Location & Coordinates ---
   const presetSelect = container.querySelector('#setting-location-preset');
   const cityInput = container.querySelector('#setting-weather-city');
   const latInput = container.querySelector('#setting-weather-lat');
@@ -215,17 +269,10 @@ export async function render(container) {
     });
   }
 
-  // Attach Form Submit Handler
-  const form = container.querySelector('#settings-form');
-  if (form) {
-    form.addEventListener('submit', async (e) => {
+  const formWeather = container.querySelector('#form-weather');
+  if (formWeather) {
+    formWeather.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const userName = container.querySelector('#setting-name').value.trim() || 'User';
-      const workStart = container.querySelector('#setting-work-start').value || '09:00';
-      const workEnd = container.querySelector('#setting-work-end').value || '18:00';
-      const timezone = container.querySelector('#setting-timezone').value.trim() || 'UTC';
-      const theme = container.querySelector('#setting-theme').value;
-
       const weatherCity = cityInput.value.trim();
       let weatherLat = latInput.value.trim();
       let weatherLon = lonInput.value.trim();
@@ -244,22 +291,16 @@ export async function render(container) {
         } catch (err) {}
       }
 
-      await store.setSetting('userName', userName);
-      await store.setSetting('workStart', workStart);
-      await store.setSetting('workEnd', workEnd);
-      await store.setSetting('timezone', timezone);
-      await store.setSetting('theme', theme);
       await store.setSetting('weatherCity', weatherCity);
       await store.setSetting('weatherLat', weatherLat);
       await store.setSetting('weatherLon', weatherLon);
 
-      document.documentElement.setAttribute('data-theme', theme);
       await renderAllWidgets();
-      alert('Preferences & Location saved successfully!');
+      alert('Weather location saved successfully!');
     });
   }
 
-  // Attach Event: Add Custom Quote
+  // --- Handlers for SECTION 3: Custom Quotes & Encouragements ---
   const addQuoteBtn = container.querySelector('#btn-add-custom-quote');
   const quoteInput = container.querySelector('#new-quote-text');
   const quoteCat = container.querySelector('#new-quote-category');
@@ -283,7 +324,6 @@ export async function render(container) {
     });
   }
 
-  // Attach Event: Delete Custom Quote
   container.querySelectorAll('.btn-delete-quote').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const msgId = btn.getAttribute('data-id');
@@ -292,7 +332,7 @@ export async function render(container) {
     });
   });
 
-  // Attach Export Backup Handler
+  // --- Handlers for SECTION 4: Local Storage & Portability ---
   const exportBtn = container.querySelector('#btn-export-backup');
   if (exportBtn) {
     exportBtn.addEventListener('click', async () => {
@@ -301,7 +341,6 @@ export async function render(container) {
     });
   }
 
-  // Attach Import Backup Handler
   const importInput = container.querySelector('#btn-import-backup');
   if (importInput) {
     importInput.addEventListener('change', async (e) => {

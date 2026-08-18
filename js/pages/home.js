@@ -1,4 +1,4 @@
-﻿/**
+/**
  * js/pages/home.js - Home Page Dashboard with Quick Links & Status Overview
  */
 
@@ -21,6 +21,20 @@ export async function render(container) {
   const projects = await store.getProjects();
   const activeProjects = projects.filter(p => p.status !== 'completed');
 
+  const tasks = await store.getTasks();
+  const calls = await store.getCalls();
+  const emails = await store.getEmails();
+  const meetings = await store.getMeetings();
+  const reminders = await store.getReminders();
+  const activities = await store.getActivities();
+
+  const pendingTasks = tasks.filter(t => t.status !== 'completed').length;
+  const pendingCalls = calls.filter(c => c.status !== 'done').length;
+  const pendingEmails = emails.filter(e => e.status !== 'done' && e.status !== 'sent').length;
+  const pendingMeetings = meetings.filter(m => m.status !== 'done').length;
+  const pendingReminders = reminders.filter(r => r.status !== 'done').length;
+  const totalActivities = activities.length;
+
   let links = await store.getSetting('quickLinks', null);
   if (!links) {
     links = DEFAULT_QUICK_LINKS;
@@ -42,6 +56,43 @@ export async function render(container) {
             ? 'Focus on what matters. Finish what you can. Leave the rest for tomorrow.'
             : 'You are outside working hours. Take a breath and remember to disconnect.'}
         </p>
+      </div>
+
+      <!-- Quick Pending Items Pill Bar -->
+      <div class="pending-pills-bar">
+        <div style="font-size: var(--font-size-xs); font-weight: 600; text-transform: uppercase; color: var(--color-text-subtle); margin-right: 4px;">
+          ⚡ Pending & Trackers:
+        </div>
+
+        <button class="pending-pill" data-widget="tasks" title="Jump to Focus Tasks">
+          <span>📋 Tasks</span>
+          <span class="pending-pill-count ${pendingTasks > 0 ? 'has-items' : 'zero-items'}">${pendingTasks}</span>
+        </button>
+
+        <button class="pending-pill" data-widget="calls" title="Jump to Calls">
+          <span>📞 Calls</span>
+          <span class="pending-pill-count ${pendingCalls > 0 ? 'has-items' : 'zero-items'}">${pendingCalls}</span>
+        </button>
+
+        <button class="pending-pill" data-widget="emails" title="Jump to Emails">
+          <span>✉️ Emails</span>
+          <span class="pending-pill-count ${pendingEmails > 0 ? 'has-items' : 'zero-items'}">${pendingEmails}</span>
+        </button>
+
+        <button class="pending-pill" data-widget="meetings" title="Jump to Meetings">
+          <span>📅 Meetings</span>
+          <span class="pending-pill-count ${pendingMeetings > 0 ? 'has-items' : 'zero-items'}">${pendingMeetings}</span>
+        </button>
+
+        <button class="pending-pill" data-widget="reminders" title="Jump to Reminders">
+          <span>⏰ Reminders</span>
+          <span class="pending-pill-count ${pendingReminders > 0 ? 'has-items' : 'zero-items'}">${pendingReminders}</span>
+        </button>
+
+        <button class="pending-pill" data-widget="dayssince" title="Jump to Days Since Tracker">
+          <span>🕐 Days Since</span>
+          <span class="pending-pill-count ${totalActivities > 0 ? 'has-items' : 'zero-items'}">${totalActivities}</span>
+        </button>
       </div>
 
       <!-- Quick Metrics & Philosophy -->
@@ -163,6 +214,20 @@ export async function render(container) {
       current = current.filter(l => l.id !== id);
       await store.setSetting('quickLinks', current);
       render(container);
+    });
+  });
+
+  // Attach Event: Click Pending Pill to Scroll & Highlight Right Rail Widget
+  container.querySelectorAll('.pending-pill').forEach((pill) => {
+    pill.addEventListener('click', () => {
+      const widgetName = pill.getAttribute('data-widget');
+      const targetEl = document.getElementById(`widget-slot-${widgetName}`);
+      if (targetEl) {
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        targetEl.classList.remove('widget-slot-glow');
+        void targetEl.offsetWidth; // Trigger reflow for animation reset
+        targetEl.classList.add('widget-slot-glow');
+      }
     });
   });
 }

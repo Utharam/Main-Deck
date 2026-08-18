@@ -1,4 +1,4 @@
-﻿/**
+/**
  * js/app.js - Main Application Orchestrator, Router & ReadMe Guide
  */
 
@@ -48,6 +48,43 @@ const registeredRightWidgets = [
 ];
 
 /**
+ * Quirk Theme Definitions — 7 daily accent moods
+ */
+const QUIRK_LIST = [
+  { slug: 'calm-tide', name: 'Calm Tide' },
+  { slug: 'morning-fog', name: 'Morning Fog' },
+  { slug: 'warm-clay', name: 'Warm Clay' },
+  { slug: 'moss-garden', name: 'Moss Garden' },
+  { slug: 'desert-wind', name: 'Desert Wind' },
+  { slug: 'plum-dusk', name: 'Plum Dusk' },
+  { slug: 'steel-dawn', name: 'Steel Dawn' }
+];
+
+export { QUIRK_LIST };
+
+/**
+ * Get today's auto-selected quirk slug based on day-of-year
+ */
+function getTodaysQuirk() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const dayOfYear = Math.floor((now - start) / (1000 * 60 * 60 * 24));
+  return QUIRK_LIST[dayOfYear % QUIRK_LIST.length].slug;
+}
+
+/**
+ * Apply quirk theme to the document
+ */
+export function applyQuirk(quirkSlug) {
+  if (!quirkSlug || quirkSlug === 'calm-tide') {
+    // Calm Tide is the default — remove any quirk override
+    document.documentElement.removeAttribute('data-quirk');
+  } else {
+    document.documentElement.setAttribute('data-quirk', quirkSlug);
+  }
+}
+
+/**
  * Initialize Application
  */
 async function init() {
@@ -55,48 +92,60 @@ async function init() {
     // 1. Check mobile detection notice
     checkMobileNotice();
 
-    // 2. Initialize DB and defaults
+    // 2. Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch((err) => {
+        console.warn('Service worker registration failed:', err);
+      });
+    }
+
+    // 3. Initialize DB and defaults
     await store.initializeDefaults();
 
-    // 3. Load theme
+    // 4. Load theme
     const theme = await store.getSetting('theme', 'light');
     document.documentElement.setAttribute('data-theme', theme);
 
-    // 4. Start Live Clock in Header
+    // 5. Load quirk (daily auto or user-selected)
+    const quirkPref = await store.getSetting('quirk', 'auto');
+    const activeQuirk = quirkPref === 'auto' ? getTodaysQuirk() : quirkPref;
+    applyQuirk(activeQuirk);
+
+    // 6. Start Live Clock in Header
     startHeaderClock();
 
-    // 5. Mount Header Weather Widget
+    // 7. Mount Header Weather Widget
     const headerWeatherEl = document.getElementById('header-weather');
     if (headerWeatherEl) {
       await weatherWidget.render(headerWeatherEl);
     }
 
-    // 6. Read Me Guide button listener
+    // 8. Read Me Guide button listener
     setupReadMeGuide();
 
-    // 7. Global Search shortcut (Ctrl+K or Header button)
+    // 9. Global Search shortcut (Ctrl+K or Header button)
     setupSearch();
 
-    // 8. Setup Router
+    // 10. Setup Router
     window.addEventListener('hashchange', handleRoute);
     handleRoute();
 
-    // 9. Render Right Rail Widgets
+    // 11. Render Right Rail Widgets
     await renderAllWidgets();
 
-    // 10. Mount Footer Stress Meter (Center)
+    // 12. Mount Footer Stress Meter (Center)
     const footerStressEl = document.getElementById('footer-stress-meter');
     if (footerStressEl) {
       await stressWidget.render(footerStressEl);
     }
 
-    // 11. Mount Footer Messages Widget (Left)
+    // 13. Mount Footer Messages Widget (Left)
     const footerMsgEl = document.getElementById('footer-quote-text');
     if (footerMsgEl) {
       await messagesWidget.render(footerMsgEl);
     }
 
-    // 12. Check Backup Banner
+    // 14. Check Backup Banner
     checkBackupPrompt();
 
   } catch (error) {

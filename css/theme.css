@@ -1,4 +1,4 @@
-﻿/* css/theme.css - Calm, distraction-free Light & Dark themes */
+/* css/theme.css - Calm, distraction-free Light & Dark themes */
 
 :root, [data-theme="light"] {
   --color-bg-app: #f7f9fa;
@@ -68,4 +68,96 @@
   --color-banner-bg: #1e293b;
   --color-banner-border: #38bdf8;
   --color-banner-text: #e0f2fe;
+}
+
+/* ============================================================
+   QUIRK THEMES — Subtle daily accent shifts
+   Each quirk overrides only the primary accent color family.
+   They layer on top of both light and dark base themes.
+   ============================================================ */
+
+/* Quirk 1: Calm Tide — The default ocean blue (no override needed, matches base) */
+
+/* Quirk 2: Morning Fog — Cool slate-lavender */
+[data-quirk="morning-fog"] {
+  --color-primary: #7c8db5;
+  --color-primary-hover: #6675a0;
+  --color-primary-subtle: #eef1f7;
+  --color-primary-text: #5a6a94;
+}
+[data-theme="dark"][data-quirk="morning-fog"] {
+  --color-primary: #9aaad0;
+  --color-primary-hover: #b3bfdd;
+  --color-primary-subtle: rgba(154, 170, 208, 0.15);
+  --color-primary-text: #9aaad0;
+}
+
+/* Quirk 3: Warm Clay — Earthy terracotta */
+[data-quirk="warm-clay"] {
+  --color-primary: #c2785a;
+  --color-primary-hover: #a8614a;
+  --color-primary-subtle: #faf0eb;
+  --color-primary-text: #a8614a;
+}
+[data-theme="dark"][data-quirk="warm-clay"] {
+  --color-primary: #d4916f;
+  --color-primary-hover: #e0a889;
+  --color-primary-subtle: rgba(212, 145, 111, 0.15);
+  --color-primary-text: #d4916f;
+}
+
+/* Quirk 4: Moss Garden — Muted sage green */
+[data-quirk="moss-garden"] {
+  --color-primary: #5a8a6e;
+  --color-primary-hover: #4a7660;
+  --color-primary-subtle: #ecf5f0;
+  --color-primary-text: #4a7660;
+}
+[data-theme="dark"][data-quirk="moss-garden"] {
+  --color-primary: #78b090;
+  --color-primary-hover: #93c5a8;
+  --color-primary-subtle: rgba(120, 176, 144, 0.15);
+  --color-primary-text: #78b090;
+}
+
+/* Quirk 5: Desert Wind — Sandy amber */
+[data-quirk="desert-wind"] {
+  --color-primary: #b89045;
+  --color-primary-hover: #9e7a38;
+  --color-primary-subtle: #faf5ea;
+  --color-primary-text: #9e7a38;
+}
+[data-theme="dark"][data-quirk="desert-wind"] {
+  --color-primary: #d4aa5c;
+  --color-primary-hover: #e0be7a;
+  --color-primary-subtle: rgba(212, 170, 92, 0.15);
+  --color-primary-text: #d4aa5c;
+}
+
+/* Quirk 6: Plum Dusk — Muted plum-mauve */
+[data-quirk="plum-dusk"] {
+  --color-primary: #8b6c8a;
+  --color-primary-hover: #765a75;
+  --color-primary-subtle: #f4eef4;
+  --color-primary-text: #765a75;
+}
+[data-theme="dark"][data-quirk="plum-dusk"] {
+  --color-primary: #ad8eac;
+  --color-primary-hover: #c2a7c1;
+  --color-primary-subtle: rgba(173, 142, 172, 0.15);
+  --color-primary-text: #ad8eac;
+}
+
+/* Quirk 7: Steel Dawn — Cool gunmetal */
+[data-quirk="steel-dawn"] {
+  --color-primary: #6b7d8d;
+  --color-primary-hover: #586a79;
+  --color-primary-subtle: #eff2f5;
+  --color-primary-text: #586a79;
+}
+[data-theme="dark"][data-quirk="steel-dawn"] {
+  --color-primary: #8da0b0;
+  --color-primary-hover: #a6b5c2;
+  --color-primary-subtle: rgba(141, 160, 176, 0.15);
+  --color-primary-text: #8da0b0;
 }
