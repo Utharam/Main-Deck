@@ -1,73 +1,356 @@
-/* css/theme.css - Calm, distraction-free Light & Dark themes */
+/* css/theme.css - Executive Calm Light & Dark Themes + 7 Daily Quirk Accents */
 
-:root, [data-theme="light"] {
-  --color-bg-app: #f7f9fa;
+/* css/theme.css - 5 Curated Palette Themes + 7 Daily Quirk Accents */
+
+/* ============================================================
+   PALETTE 1: 🌿 Soft Pastel Green (Gentle Morning Breeze) - DEFAULT
+   ============================================================ */
+:root, [data-theme="pastel-green"], [data-theme="light"] {
+  --color-bg-app: #fbf9f4;
   --color-bg-surface: #ffffff;
-  --color-bg-surface-hover: #f1f4f6;
-  --color-bg-sidebar: #edf2f5;
+  --color-bg-surface-hover: #fcfbf9;
+  --color-bg-sidebar: #a8d5be;
+  --color-bg-sidebar-hover: rgba(255, 255, 255, 0.24);
   --color-bg-sidebar-active: #ffffff;
-  --color-bg-subtle: #f8fafb;
+  --color-text-sidebar: rgba(255, 255, 255, 0.98);
+  --color-text-sidebar-muted: rgba(255, 255, 255, 0.82);
+  --color-text-sidebar-active: #214432;
+  --color-bg-subtle: #f3eee6;
   --color-bg-card: #ffffff;
+  --color-card-border-top: rgba(255, 255, 255, 0.98);
 
-  --color-text-main: #1e293b;
-  --color-text-muted: #64748b;
+  --color-text-main: #1e2824;
+  --color-text-muted: #64756d;
+  --color-text-subtle: #96a69f;
+  --color-text-inverse: #ffffff;
+
+  --color-border: #ece6dc;
+  --color-border-subtle: #f5f0e8;
+  --color-border-strong: #dbd3c5;
+
+  --color-scrollbar-thumb: rgba(168, 213, 190, 0.5);
+  --color-scrollbar-thumb-hover: rgba(120, 175, 148, 0.75);
+
+  /* Primary royal lilac / violet (from screenshot "+ Task" and "Start Timer" pill) */
+  --color-primary: #7059e6;
+  --color-primary-hover: #5d45d9;
+  --color-primary-subtle: rgba(112, 89, 230, 0.12);
+  --color-primary-text: #7059e6;
+
+  --color-success: #16a34a;
+  --color-success-subtle: rgba(22, 163, 74, 0.12);
+  --color-warning: #ea580c;
+  --color-warning-subtle: rgba(234, 88, 12, 0.12);
+  --color-danger: #dc2626;
+  --color-danger-subtle: rgba(220, 38, 38, 0.12);
+
+  --color-banner-bg: #fdf5eb;
+  --color-banner-border: #f8dfbe;
+  --color-banner-text: #9a4c10;
+
+  /* Pastel Squircle Tokens */
+  --pastel-lilac-bg: #eee9fc;
+  --pastel-lilac-border: #ded4fa;
+  --pastel-lilac-text: #7059e6;
+  --pastel-peach-bg: #fdeee3;
+  --pastel-peach-border: #fad5bf;
+  --pastel-peach-text: #d94f0e;
+  --pastel-mint-bg: #e7f7ed;
+  --pastel-mint-border: #c4ebd1;
+  --pastel-mint-text: #16a34a;
+  --pastel-sky-bg: #e7f4fe;
+  --pastel-sky-border: #c7e5fc;
+  --pastel-sky-text: #0284c7;
+  --pastel-amber-bg: #fef5e6;
+  --pastel-amber-border: #fde4ba;
+  --pastel-amber-text: #d97706;
+
+  /* Hero Greeting Gradient (Soft Pastel Peach) */
+  --hero-gradient: linear-gradient(135deg, #fde7d8 0%, #fad8c4 100%);
+  --hero-text-title: #422315;
+  --hero-text-subtitle: #7a4d38;
+
+  /* Diffused warm bento shadows */
+  --card-shadow: 0 8px 24px -4px rgba(180, 160, 140, 0.07), 0 2px 6px -1px rgba(180, 160, 140, 0.04);
+  --card-shadow-hover: 0 14px 32px -4px rgba(180, 160, 140, 0.12), 0 4px 10px -2px rgba(180, 160, 140, 0.06);
+}
+
+/* ============================================================
+   PALETTE 2: 🍃 Executive Sage Green (Grounding Matcha)
+   ============================================================ */
+[data-theme="sage-green"] {
+  --color-bg-app: #f6f3ec;
+  --color-bg-surface: #ffffff;
+  --color-bg-surface-hover: #fbf9f6;
+  --color-bg-sidebar: #94bea8;
+  --color-bg-sidebar-hover: rgba(255, 255, 255, 0.18);
+  --color-bg-sidebar-active: #ffffff;
+  --color-text-sidebar: rgba(255, 255, 255, 0.96);
+  --color-text-sidebar-muted: rgba(255, 255, 255, 0.75);
+  --color-text-sidebar-active: #1a3828;
+  --color-bg-subtle: #ede8df;
+  --color-bg-card: #ffffff;
+  --color-card-border-top: rgba(255, 255, 255, 0.95);
+
+  --color-text-main: #1b2723;
+  --color-text-muted: #5e7269;
+  --color-text-subtle: #8e9f97;
+  --color-text-inverse: #ffffff;
+
+  --color-border: #e4ddd2;
+  --color-border-subtle: #f0eae0;
+  --color-border-strong: #d2c8b8;
+
+  --color-scrollbar-thumb: rgba(148, 190, 168, 0.45);
+  --color-scrollbar-thumb-hover: rgba(94, 140, 115, 0.7);
+
+  --color-primary: #6b52e0;
+  --color-primary-hover: #583ecc;
+  --color-primary-subtle: rgba(107, 82, 224, 0.12);
+  --color-primary-text: #6b52e0;
+
+  --color-success: #16a34a;
+  --color-success-subtle: rgba(22, 163, 74, 0.12);
+  --color-warning: #ea580c;
+  --color-warning-subtle: rgba(234, 88, 12, 0.12);
+  --color-danger: #dc2626;
+  --color-danger-subtle: rgba(220, 38, 38, 0.12);
+
+  --color-banner-bg: #fdf5eb;
+  --color-banner-border: #f8dfbe;
+  --color-banner-text: #9a4c10;
+
+  --pastel-lilac-bg: #eee9fc;
+  --pastel-lilac-border: #ded4fa;
+  --pastel-lilac-text: #6b52e0;
+  --pastel-peach-bg: #fdeee3;
+  --pastel-peach-border: #fad5bf;
+  --pastel-peach-text: #d94f0e;
+  --pastel-mint-bg: #e7f7ed;
+  --pastel-mint-border: #c4ebd1;
+  --pastel-mint-text: #16a34a;
+  --pastel-sky-bg: #e7f4fe;
+  --pastel-sky-border: #c7e5fc;
+  --pastel-sky-text: #0284c7;
+  --pastel-amber-bg: #fef5e6;
+  --pastel-amber-border: #fde4ba;
+  --pastel-amber-text: #d97706;
+
+  --hero-gradient: linear-gradient(135deg, #fde4cf 0%, #fbd5be 100%);
+  --hero-text-title: #3f1f0f;
+  --hero-text-subtitle: #7a4d36;
+
+  --card-shadow: 0 6px 20px -2px rgba(145, 130, 115, 0.07), 0 2px 6px -1px rgba(145, 130, 115, 0.04);
+  --card-shadow-hover: 0 12px 28px -4px rgba(145, 130, 115, 0.12), 0 4px 10px -2px rgba(145, 130, 115, 0.06);
+}
+
+/* ============================================================
+   PALETTE 3: 🏺 Warm Clay & Sand (Terracotta Earth)
+   ============================================================ */
+[data-theme="warm-clay"] {
+  --color-bg-app: #faf6f0;
+  --color-bg-surface: #ffffff;
+  --color-bg-surface-hover: #fcf9f5;
+  --color-bg-sidebar: #dfb299;
+  --color-bg-sidebar-hover: rgba(255, 255, 255, 0.22);
+  --color-bg-sidebar-active: #ffffff;
+  --color-text-sidebar: rgba(255, 255, 255, 0.96);
+  --color-text-sidebar-muted: rgba(255, 255, 255, 0.78);
+  --color-text-sidebar-active: #7c2d12;
+  --color-bg-subtle: #f3ece3;
+  --color-bg-card: #ffffff;
+  --color-card-border-top: rgba(255, 255, 255, 0.98);
+
+  --color-text-main: #2b1d16;
+  --color-text-muted: #786459;
+  --color-text-subtle: #a6958c;
+  --color-text-inverse: #ffffff;
+
+  --color-border: #ecdfd3;
+  --color-border-subtle: #f6efe7;
+  --color-border-strong: #dbc9ba;
+
+  --color-scrollbar-thumb: rgba(223, 178, 153, 0.5);
+  --color-scrollbar-thumb-hover: rgba(194, 135, 102, 0.7);
+
+  --color-primary: #ea580c;
+  --color-primary-hover: #c2410c;
+  --color-primary-subtle: rgba(234, 88, 12, 0.12);
+  --color-primary-text: #ea580c;
+
+  --color-success: #16a34a;
+  --color-success-subtle: rgba(22, 163, 74, 0.12);
+  --color-warning: #ea580c;
+  --color-warning-subtle: rgba(234, 88, 12, 0.12);
+  --color-danger: #dc2626;
+  --color-danger-subtle: rgba(220, 38, 38, 0.12);
+
+  --color-banner-bg: #fdf5eb;
+  --color-banner-border: #f8dfbe;
+  --color-banner-text: #9a4c10;
+
+  --pastel-lilac-bg: #fbf0ea;
+  --pastel-lilac-border: #f5d6c4;
+  --pastel-lilac-text: #ea580c;
+  --pastel-peach-bg: #fdeee3;
+  --pastel-peach-border: #fad5bf;
+  --pastel-peach-text: #d94f0e;
+  --pastel-mint-bg: #e7f7ed;
+  --pastel-mint-border: #c4ebd1;
+  --pastel-mint-text: #16a34a;
+  --pastel-sky-bg: #e7f4fe;
+  --pastel-sky-border: #c7e5fc;
+  --pastel-sky-text: #0284c7;
+  --pastel-amber-bg: #fef5e6;
+  --pastel-amber-border: #fde4ba;
+  --pastel-amber-text: #d97706;
+
+  --hero-gradient: linear-gradient(135deg, #fde5d2 0%, #fad2b6 100%);
+  --hero-text-title: #431f0f;
+  --hero-text-subtitle: #834c32;
+
+  --card-shadow: 0 8px 24px -4px rgba(185, 150, 130, 0.08), 0 2px 6px -1px rgba(185, 150, 130, 0.04);
+  --card-shadow-hover: 0 14px 30px -4px rgba(185, 150, 130, 0.13), 0 4px 10px -2px rgba(185, 150, 130, 0.06);
+}
+
+/* ============================================================
+   PALETTE 4: ☁️ Calm Studio Light (Minimal Slate & Ocean)
+   ============================================================ */
+[data-theme="calm-light"] {
+  --color-bg-app: #f8fafc;
+  --color-bg-surface: #ffffff;
+  --color-bg-surface-hover: #f1f5f9;
+  --color-bg-sidebar: #eef2f6;
+  --color-bg-sidebar-hover: #e2e8f0;
+  --color-bg-sidebar-active: #ffffff;
+  --color-text-sidebar: #334155;
+  --color-text-sidebar-muted: #64748b;
+  --color-text-sidebar-active: #0284c7;
+  --color-bg-subtle: #f1f5f9;
+  --color-bg-card: #ffffff;
+  --color-card-border-top: rgba(255, 255, 255, 0.98);
+
+  --color-text-main: #0f172a;
+  --color-text-muted: #475569;
   --color-text-subtle: #94a3b8;
   --color-text-inverse: #ffffff;
 
   --color-border: #e2e8f0;
-  --color-border-subtle: #cbd5e1;
-  --color-border-strong: #94a3b8;
+  --color-border-subtle: #f1f5f9;
+  --color-border-strong: #cbd5e1;
+
+  --color-scrollbar-thumb: rgba(148, 163, 184, 0.45);
+  --color-scrollbar-thumb-hover: rgba(100, 116, 139, 0.7);
 
   --color-primary: #0284c7;
   --color-primary-hover: #0369a1;
-  --color-primary-subtle: #e0f2fe;
-  --color-primary-text: #0369a1;
+  --color-primary-subtle: rgba(2, 132, 199, 0.1);
+  --color-primary-text: #0284c7;
 
-  --color-success: #16a34a;
-  --color-success-subtle: #dcfce7;
-  --color-warning: #d97706;
-  --color-warning-subtle: #fef3c7;
-  --color-danger: #dc2626;
-  --color-danger-subtle: #fee2e2;
+  --color-success: #10b981;
+  --color-success-subtle: rgba(16, 185, 129, 0.1);
+  --color-warning: #f59e0b;
+  --color-warning-subtle: rgba(245, 158, 11, 0.1);
+  --color-danger: #ef4444;
+  --color-danger-subtle: rgba(239, 68, 68, 0.1);
 
-  --color-banner-bg: #eff6ff;
-  --color-banner-border: #bfdbfe;
-  --color-banner-text: #1e40af;
+  --color-banner-bg: #f0f9ff;
+  --color-banner-border: #bae6fd;
+  --color-banner-text: #0369a1;
+
+  --pastel-lilac-bg: #e0f2fe;
+  --pastel-lilac-border: #bae6fd;
+  --pastel-lilac-text: #0284c7;
+  --pastel-peach-bg: #ffedd5;
+  --pastel-peach-border: #fed7aa;
+  --pastel-peach-text: #c2410c;
+  --pastel-mint-bg: #dcfce7;
+  --pastel-mint-border: #bbf7d0;
+  --pastel-mint-text: #15803d;
+  --pastel-sky-bg: #e0f2fe;
+  --pastel-sky-border: #bae6fd;
+  --pastel-sky-text: #0369a1;
+  --pastel-amber-bg: #fef3c7;
+  --pastel-amber-border: #fde68a;
+  --pastel-amber-text: #b45309;
+
+  --hero-gradient: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+  --hero-text-title: #0369a1;
+  --hero-text-subtitle: #0284c7;
+
+  --card-shadow: 0 6px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+  --card-shadow-hover: 0 12px 28px -4px rgba(15, 23, 42, 0.09), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
 }
 
-[data-theme="dark"] {
-  --color-bg-app: #0f172a;
-  --color-bg-surface: #1e293b;
-  --color-bg-surface-hover: #334155;
-  --color-bg-sidebar: #141e33;
-  --color-bg-sidebar-active: #1e293b;
-  --color-bg-subtle: #182234;
-  --color-bg-card: #1e293b;
+/* ============================================================
+   PALETTE 5: 🌘 Midnight Forest Dark (Focused Obsidian & Night Mint)
+   ============================================================ */
+[data-theme="midnight-dark"], [data-theme="dark"] {
+  --color-bg-app: #121816;
+  --color-bg-surface: #1a2320;
+  --color-bg-surface-hover: #222e2a;
+  --color-bg-sidebar: #15201c;
+  --color-bg-sidebar-hover: rgba(255, 255, 255, 0.08);
+  --color-bg-sidebar-active: #273a33;
+  --color-text-sidebar: rgba(255, 255, 255, 0.9);
+  --color-text-sidebar-muted: rgba(255, 255, 255, 0.6);
+  --color-text-sidebar-active: #7ee0b3;
+  --color-bg-subtle: #1e2925;
+  --color-bg-card: #1a2320;
+  --color-card-border-top: rgba(255, 255, 255, 0.08);
 
-  --color-text-main: #f1f5f9;
-  --color-text-muted: #94a3b8;
-  --color-text-subtle: #64748b;
-  --color-text-inverse: #0f172a;
+  --color-text-main: #f1f6f3;
+  --color-text-muted: #9bb1a7;
+  --color-text-subtle: #6e857b;
+  --color-text-inverse: #121816;
 
-  --color-border: #334155;
-  --color-border-subtle: #475569;
-  --color-border-strong: #64748b;
+  --color-border: rgba(255, 255, 255, 0.09);
+  --color-border-subtle: rgba(255, 255, 255, 0.05);
+  --color-border-strong: rgba(255, 255, 255, 0.18);
 
-  --color-primary: #38bdf8;
-  --color-primary-hover: #7dd3fc;
-  --color-primary-subtle: rgba(56, 189, 248, 0.15);
-  --color-primary-text: #38bdf8;
+  --color-scrollbar-thumb: rgba(255, 255, 255, 0.15);
+  --color-scrollbar-thumb-hover: rgba(255, 255, 255, 0.28);
 
-  --color-success: #22c55e;
-  --color-success-subtle: rgba(34, 197, 94, 0.15);
-  --color-warning: #f59e0b;
-  --color-warning-subtle: rgba(245, 158, 11, 0.15);
-  --color-danger: #ef4444;
-  --color-danger-subtle: rgba(239, 68, 68, 0.15);
+  --color-primary: #9b87f5;
+  --color-primary-hover: #b5a5fb;
+  --color-primary-subtle: rgba(155, 135, 245, 0.18);
+  --color-primary-text: #b5a5fb;
 
-  --color-banner-bg: #1e293b;
-  --color-banner-border: #38bdf8;
-  --color-banner-text: #e0f2fe;
+  --color-success: #34d399;
+  --color-success-subtle: rgba(52, 211, 153, 0.16);
+  --color-warning: #fb923c;
+  --color-warning-subtle: rgba(251, 146, 60, 0.16);
+  --color-danger: #f87171;
+  --color-danger-subtle: rgba(248, 113, 113, 0.16);
+
+  --color-banner-bg: #271c16;
+  --color-banner-border: rgba(251, 146, 60, 0.3);
+  --color-banner-text: #fed7aa;
+
+  /* Pastel Squircle Tokens for Dark */
+  --pastel-lilac-bg: rgba(155, 135, 245, 0.15);
+  --pastel-lilac-border: rgba(155, 135, 245, 0.3);
+  --pastel-lilac-text: #c4b5fd;
+  --pastel-peach-bg: rgba(251, 146, 60, 0.15);
+  --pastel-peach-border: rgba(251, 146, 60, 0.3);
+  --pastel-peach-text: #fdba74;
+  --pastel-mint-bg: rgba(52, 211, 153, 0.15);
+  --pastel-mint-border: rgba(52, 211, 153, 0.3);
+  --pastel-mint-text: #6ee7b7;
+  --pastel-sky-bg: rgba(56, 189, 248, 0.15);
+  --pastel-sky-border: rgba(56, 189, 248, 0.3);
+  --pastel-sky-text: #7dd3fc;
+  --pastel-amber-bg: rgba(251, 191, 36, 0.15);
+  --pastel-amber-border: rgba(251, 191, 36, 0.3);
+  --pastel-amber-text: #fde047;
+
+  /* Hero Gradient for Dark */
+  --hero-gradient: linear-gradient(135deg, #2d211a 0%, #241913 100%);
+  --hero-text-title: #fde5d2;
+  --hero-text-subtitle: #fcd5be;
+
+  --card-shadow: 0 6px 20px -2px rgba(0, 0, 0, 0.45);
+  --card-shadow-hover: 0 12px 28px -4px rgba(0, 0, 0, 0.6);
 }
 
 /* ============================================================
@@ -76,88 +359,88 @@
    They layer on top of both light and dark base themes.
    ============================================================ */
 
-/* Quirk 1: Calm Tide — The default ocean blue (no override needed, matches base) */
+/* Quirk 1: Calm Tide — Default Ocean Blue (defined above) */
 
 /* Quirk 2: Morning Fog — Cool slate-lavender */
 [data-quirk="morning-fog"] {
-  --color-primary: #7c8db5;
-  --color-primary-hover: #6675a0;
-  --color-primary-subtle: #eef1f7;
-  --color-primary-text: #5a6a94;
+  --color-primary: #6366f1;
+  --color-primary-hover: #4f46e5;
+  --color-primary-subtle: rgba(99, 102, 241, 0.1);
+  --color-primary-text: #4f46e5;
 }
 [data-theme="dark"][data-quirk="morning-fog"] {
-  --color-primary: #9aaad0;
-  --color-primary-hover: #b3bfdd;
-  --color-primary-subtle: rgba(154, 170, 208, 0.15);
-  --color-primary-text: #9aaad0;
+  --color-primary: #818cf8;
+  --color-primary-hover: #a5b4fc;
+  --color-primary-subtle: rgba(129, 140, 248, 0.15);
+  --color-primary-text: #818cf8;
 }
 
 /* Quirk 3: Warm Clay — Earthy terracotta */
 [data-quirk="warm-clay"] {
-  --color-primary: #c2785a;
-  --color-primary-hover: #a8614a;
-  --color-primary-subtle: #faf0eb;
-  --color-primary-text: #a8614a;
+  --color-primary: #ea580c;
+  --color-primary-hover: #c2410c;
+  --color-primary-subtle: rgba(234, 88, 12, 0.1);
+  --color-primary-text: #c2410c;
 }
 [data-theme="dark"][data-quirk="warm-clay"] {
-  --color-primary: #d4916f;
-  --color-primary-hover: #e0a889;
-  --color-primary-subtle: rgba(212, 145, 111, 0.15);
-  --color-primary-text: #d4916f;
+  --color-primary: #fb923c;
+  --color-primary-hover: #fdba74;
+  --color-primary-subtle: rgba(251, 146, 60, 0.15);
+  --color-primary-text: #fb923c;
 }
 
-/* Quirk 4: Moss Garden — Muted sage green */
+/* Quirk 4: Moss Garden — Muted calm sage green */
 [data-quirk="moss-garden"] {
-  --color-primary: #5a8a6e;
-  --color-primary-hover: #4a7660;
-  --color-primary-subtle: #ecf5f0;
-  --color-primary-text: #4a7660;
+  --color-primary: #059669;
+  --color-primary-hover: #047857;
+  --color-primary-subtle: rgba(5, 150, 105, 0.1);
+  --color-primary-text: #047857;
 }
 [data-theme="dark"][data-quirk="moss-garden"] {
-  --color-primary: #78b090;
-  --color-primary-hover: #93c5a8;
-  --color-primary-subtle: rgba(120, 176, 144, 0.15);
-  --color-primary-text: #78b090;
+  --color-primary: #34d399;
+  --color-primary-hover: #6ee7b7;
+  --color-primary-subtle: rgba(52, 211, 153, 0.15);
+  --color-primary-text: #34d399;
 }
 
-/* Quirk 5: Desert Wind — Sandy amber */
+/* Quirk 5: Desert Wind — Sandy amber clarity */
 [data-quirk="desert-wind"] {
-  --color-primary: #b89045;
-  --color-primary-hover: #9e7a38;
-  --color-primary-subtle: #faf5ea;
-  --color-primary-text: #9e7a38;
+  --color-primary: #d97706;
+  --color-primary-hover: #b45309;
+  --color-primary-subtle: rgba(217, 119, 6, 0.1);
+  --color-primary-text: #b45309;
 }
 [data-theme="dark"][data-quirk="desert-wind"] {
-  --color-primary: #d4aa5c;
-  --color-primary-hover: #e0be7a;
-  --color-primary-subtle: rgba(212, 170, 92, 0.15);
-  --color-primary-text: #d4aa5c;
+  --color-primary: #fbbf24;
+  --color-primary-hover: #fcd34d;
+  --color-primary-subtle: rgba(251, 191, 36, 0.15);
+  --color-primary-text: #fbbf24;
 }
 
-/* Quirk 6: Plum Dusk — Muted plum-mauve */
+/* Quirk 6: Plum Dusk — Muted mauve depth */
 [data-quirk="plum-dusk"] {
-  --color-primary: #8b6c8a;
-  --color-primary-hover: #765a75;
-  --color-primary-subtle: #f4eef4;
-  --color-primary-text: #765a75;
+  --color-primary: #9333ea;
+  --color-primary-hover: #7e22ce;
+  --color-primary-subtle: rgba(147, 51, 234, 0.1);
+  --color-primary-text: #7e22ce;
 }
 [data-theme="dark"][data-quirk="plum-dusk"] {
-  --color-primary: #ad8eac;
-  --color-primary-hover: #c2a7c1;
-  --color-primary-subtle: rgba(173, 142, 172, 0.15);
-  --color-primary-text: #ad8eac;
+  --color-primary: #c084fc;
+  --color-primary-hover: #d8b4fe;
+  --color-primary-subtle: rgba(192, 132, 252, 0.15);
+  --color-primary-text: #c084fc;
 }
 
-/* Quirk 7: Steel Dawn — Cool gunmetal */
+/* Quirk 7: Steel Dawn — Sharp, cool gunmetal */
 [data-quirk="steel-dawn"] {
-  --color-primary: #6b7d8d;
-  --color-primary-hover: #586a79;
-  --color-primary-subtle: #eff2f5;
-  --color-primary-text: #586a79;
+  --color-primary: #475569;
+  --color-primary-hover: #334155;
+  --color-primary-subtle: rgba(71, 85, 105, 0.1);
+  --color-primary-text: #334155;
 }
 [data-theme="dark"][data-quirk="steel-dawn"] {
-  --color-primary: #8da0b0;
-  --color-primary-hover: #a6b5c2;
-  --color-primary-subtle: rgba(141, 160, 176, 0.15);
-  --color-primary-text: #8da0b0;
+  --color-primary: #94a3b8;
+  --color-primary-hover: #cbd5e1;
+  --color-primary-subtle: rgba(148, 163, 184, 0.15);
+  --color-primary-text: #94a3b8;
 }

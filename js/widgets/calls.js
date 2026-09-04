@@ -1,9 +1,10 @@
-﻿/**
+/**
  * js/widgets/calls.js - Upcoming Calls Attention Widget
  */
 
 import * as store from '../store.js';
 import { escapeHtml, emptyStateHtml, showModal } from '../ui.js';
+import { icons } from '../icons.js';
 
 export const widget = {
   name: 'calls',
@@ -17,8 +18,11 @@ export const widget = {
     container.innerHTML = `
       <div class="widget-card">
         <div class="widget-header">
-          <div class="widget-title">📞 Calls</div>
-          <button class="btn-icon btn-xs" id="widget-add-call" title="Add call">+</button>
+          <div class="widget-title">
+            <span style="display: inline-flex; align-items: center; color: var(--color-primary);">${icons.calls}</span>
+            <span>Calls</span>
+          </div>
+          <button class="btn-icon btn-xs" id="widget-add-call" title="Add call">${icons.plus}</button>
         </div>
         <div class="widget-body">
           ${activeCalls.length === 0 

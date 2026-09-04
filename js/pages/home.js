@@ -5,6 +5,7 @@
 import * as store from '../store.js';
 import { escapeHtml, showModal } from '../ui.js';
 import { isWithinWorkingHours } from '../utils/time.js';
+import { icons } from '../icons.js';
 
 const DEFAULT_QUICK_LINKS = [
   { id: 'ql-1', name: 'Google Sheets', url: 'https://sheets.google.com', icon: '📊' },
@@ -41,121 +42,204 @@ export async function render(container) {
     await store.setSetting('quickLinks', links);
   }
 
+  const now = new Date();
+  const currentHour = now.getHours();
+  let greetingTitle = 'Good Afternoon! ⛅';
+  if (currentHour < 12) greetingTitle = 'Good Morning! ☀️';
+  else if (currentHour < 17) greetingTitle = 'Good Afternoon! ⛅';
+  else if (currentHour < 21) greetingTitle = 'Good Evening! 🌇';
+  else greetingTitle = 'Rest Well Tonight! 🌙';
+
+  const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
   container.innerHTML = `
     <div class="page-container">
-      <!-- Welcome Greeting & Status -->
-      <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: baseline;">
-          <h2>Welcome back, ${escapeHtml(userName)}</h2>
-          <span class="badge ${isWorkTime ? 'badge-primary' : 'badge-default'}">
-            ${isWorkTime ? '💼 Working Hours' : '🌙 Outside Hours'}
-          </span>
+      <!-- 1. Warm Apricot / Peach Hero Greeting Card (Reference Bento Style) -->
+      <div class="hero-bento-card">
+        <div class="hero-bento-character" title="Welcome back, ${escapeHtml(userName)}!">
+          <span>🧑‍💻</span>
         </div>
-        <p style="color: var(--color-text-muted); font-size: var(--font-size-sm); margin-top: 4px;">
-          ${isWorkTime 
-            ? 'Focus on what matters. Finish what you can. Leave the rest for tomorrow.'
-            : 'You are outside working hours. Take a breath and remember to disconnect.'}
-        </p>
-      </div>
-
-      <!-- Quick Pending Items Pill Bar -->
-      <div class="pending-pills-bar">
-        <div style="font-size: var(--font-size-xs); font-weight: 600; text-transform: uppercase; color: var(--color-text-subtle); margin-right: 4px;">
-          ⚡ Pending & Trackers:
-        </div>
-
-        <button class="pending-pill" data-widget="tasks" title="Jump to Focus Tasks">
-          <span>📋 Tasks</span>
-          <span class="pending-pill-count ${pendingTasks > 0 ? 'has-items' : 'zero-items'}">${pendingTasks}</span>
-        </button>
-
-        <button class="pending-pill" data-widget="calls" title="Jump to Calls">
-          <span>📞 Calls</span>
-          <span class="pending-pill-count ${pendingCalls > 0 ? 'has-items' : 'zero-items'}">${pendingCalls}</span>
-        </button>
-
-        <button class="pending-pill" data-widget="emails" title="Jump to Emails">
-          <span>✉️ Emails</span>
-          <span class="pending-pill-count ${pendingEmails > 0 ? 'has-items' : 'zero-items'}">${pendingEmails}</span>
-        </button>
-
-        <button class="pending-pill" data-widget="meetings" title="Jump to Meetings">
-          <span>📅 Meetings</span>
-          <span class="pending-pill-count ${pendingMeetings > 0 ? 'has-items' : 'zero-items'}">${pendingMeetings}</span>
-        </button>
-
-        <button class="pending-pill" data-widget="reminders" title="Jump to Reminders">
-          <span>⏰ Reminders</span>
-          <span class="pending-pill-count ${pendingReminders > 0 ? 'has-items' : 'zero-items'}">${pendingReminders}</span>
-        </button>
-
-        <button class="pending-pill" data-widget="dayssince" title="Jump to Days Since Tracker">
-          <span>🕐 Days Since</span>
-          <span class="pending-pill-count ${totalActivities > 0 ? 'has-items' : 'zero-items'}">${totalActivities}</span>
-        </button>
-      </div>
-
-      <!-- Quick Metrics & Philosophy -->
-      <div class="form-row">
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title">Active Projects</h3>
-            <a href="#projects" class="btn btn-xs btn-secondary">View all</a>
+        <div class="hero-bento-body">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <h2 class="hero-bento-title">${greetingTitle}</h2>
+              <div class="hero-bento-time">${timeString} · Welcome back, ${escapeHtml(userName)}!</div>
+            </div>
+            <span class="badge ${isWorkTime ? 'badge-primary' : 'badge-default'}" style="padding: 4px 12px; font-size: 12px; font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+              <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: currentColor; margin-right: 6px;"></span>
+              ${isWorkTime ? 'Working Hours' : 'Outside Hours'}
+            </span>
           </div>
-          <div style="font-size: var(--font-size-2xl); font-weight: bold; color: var(--color-primary);">
-            ${activeProjects.length}
-          </div>
-          <div style="font-size: var(--font-size-xs); color: var(--color-text-muted);">
-            ${activeProjects.length === 0 ? 'No active projects currently.' : 'Structured projects in motion'}
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title">Work Philosophy</h3>
-          </div>
-          <p style="font-size: var(--font-size-sm); color: var(--color-text-muted); line-height: 1.6;">
-            1. Work deserves focus.<br>
-            2. Rest deserves permission.<br>
-            3. Life deserves the remaining time.
+          <p class="hero-bento-quote">
+            ${isWorkTime 
+              ? 'Focus on what matters. Finish what you can. Leave the rest for tomorrow.'
+              : 'You are outside working hours. Take a breath and remember to disconnect.'}
           </p>
         </div>
       </div>
 
-      <!-- Core Work Navigation -->
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">Workspace Navigation</h3>
+      <!-- 2. Bento Stat Cards Row (Lilac, Peach, Mint Squircles) -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-4);">
+        <!-- Active Projects -->
+        <div class="bento-stat-card">
+          <div class="bento-stat-header">
+            <span class="bento-stat-title">Active Projects</span>
+            <div class="squircle-icon squircle-lilac">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="m9 14 2 2 4-4"/></svg>
+            </div>
+          </div>
+          <div class="bento-stat-num">${activeProjects.length}</div>
+          <div class="bento-stat-footer">
+            <span class="bento-stat-trend" style="color: var(--color-success);">↑ ${activeProjects.length} active</span>
+            <span>in motion</span>
+          </div>
         </div>
-        <div style="display: flex; gap: var(--space-3); flex-wrap: wrap;">
-          <a href="#projects" class="btn btn-secondary">📋 Projects & Tasks</a>
-          <a href="#phases" class="btn btn-secondary">🧩 Phases</a>
-          <a href="#sop" class="btn btn-secondary">📚 Standard Procedures (SOP)</a>
-          <a href="#notes" class="btn btn-secondary">📝 Notes</a>
-          <a href="#stressbuster" class="btn btn-secondary">🧠 2-Minute Reset</a>
+
+        <!-- Pending Tasks -->
+        <div class="bento-stat-card">
+          <div class="bento-stat-header">
+            <span class="bento-stat-title">Pending Tasks</span>
+            <div class="squircle-icon squircle-peach">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </div>
+          <div class="bento-stat-num">${pendingTasks}</div>
+          <div class="bento-stat-footer">
+            <span class="bento-stat-trend" style="color: ${pendingTasks === 0 ? 'var(--color-success)' : 'var(--color-warning)'};">
+              ${pendingTasks === 0 ? '✓ Caught up' : `⚡ ${pendingTasks} pending`}
+            </span>
+            <span>${pendingTasks === 0 ? 'great job' : 'today'}</span>
+          </div>
+        </div>
+
+        <!-- Habit / Days Since Trackers -->
+        <div class="bento-stat-card">
+          <div class="bento-stat-header">
+            <span class="bento-stat-title">Habit Trackers</span>
+            <div class="squircle-icon squircle-mint">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+          </div>
+          <div class="bento-stat-num">${totalActivities}</div>
+          <div class="bento-stat-footer">
+            <span class="bento-stat-trend" style="color: var(--color-success);">● Factual log</span>
+            <span>zero pressure</span>
+          </div>
         </div>
       </div>
 
-      <!-- Quick Links Section (Main Page Last Item) -->
+      <!-- 3. Quick Pending Attention Rail Pill Bar -->
+      <div class="pending-pills-bar">
+        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-text-subtle); margin-right: 6px; display: flex; align-items: center; gap: 4px;">
+          <span>Attention:</span>
+        </div>
+
+        <button class="pending-pill" data-widget="tasks" title="Jump to Focus Tasks">
+          <span style="display: inline-flex; align-items: center;">${icons.tasks}</span>
+          <span>Tasks</span>
+          <span class="pending-pill-count ${pendingTasks > 0 ? 'has-items' : 'zero-items'}">${pendingTasks}</span>
+        </button>
+
+        <button class="pending-pill" data-widget="calls" title="Jump to Calls">
+          <span style="display: inline-flex; align-items: center;">${icons.calls}</span>
+          <span>Calls</span>
+          <span class="pending-pill-count ${pendingCalls > 0 ? 'has-items' : 'zero-items'}">${pendingCalls}</span>
+        </button>
+
+        <button class="pending-pill" data-widget="emails" title="Jump to Emails">
+          <span style="display: inline-flex; align-items: center;">${icons.emails}</span>
+          <span>Emails</span>
+          <span class="pending-pill-count ${pendingEmails > 0 ? 'has-items' : 'zero-items'}">${pendingEmails}</span>
+        </button>
+
+        <button class="pending-pill" data-widget="meetings" title="Jump to Meetings">
+          <span style="display: inline-flex; align-items: center;">${icons.meetings}</span>
+          <span>Meetings</span>
+          <span class="pending-pill-count ${pendingMeetings > 0 ? 'has-items' : 'zero-items'}">${pendingMeetings}</span>
+        </button>
+
+        <button class="pending-pill" data-widget="reminders" title="Jump to Reminders">
+          <span style="display: inline-flex; align-items: center;">${icons.reminders}</span>
+          <span>Reminders</span>
+          <span class="pending-pill-count ${pendingReminders > 0 ? 'has-items' : 'zero-items'}">${pendingReminders}</span>
+        </button>
+
+        <button class="pending-pill" data-widget="dayssince" title="Jump to Days Since Tracker">
+          <span style="display: inline-flex; align-items: center;">${icons.dayssince}</span>
+          <span>Days Since</span>
+          <span class="pending-pill-count ${totalActivities > 0 ? 'has-items' : 'zero-items'}">${totalActivities}</span>
+        </button>
+      </div>
+
+      <!-- 4. Bento Middle Row: Navigation & Core Principles -->
+      <div class="form-row">
+        <!-- Core Work Navigation Bento -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title" style="display: flex; align-items: center; gap: 8px;">
+              <span class="squircle-icon squircle-sky" style="width: 28px; height: 28px; font-size: 14px; border-radius: 8px;">🧭</span>
+              <span>Workspace Navigation</span>
+            </h3>
+          </div>
+          <div style="display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: 4px;">
+            <a href="#projects" class="btn btn-secondary btn-sm" style="gap: 8px;">
+              <span style="display: inline-flex;">${icons.tasks}</span>
+              <span>Projects & Milestones</span>
+            </a>
+            <a href="#sop" class="btn btn-secondary btn-sm" style="gap: 8px;">
+              <span style="display: inline-flex;">${icons.sop}</span>
+              <span>Standard Procedures (SOP)</span>
+            </a>
+            <a href="#notes" class="btn btn-secondary btn-sm" style="gap: 8px;">
+              <span style="display: inline-flex;">${icons.notes}</span>
+              <span>Notes</span>
+            </a>
+            <a href="#stressbuster" class="btn btn-secondary btn-sm" style="gap: 8px;">
+              <span style="display: inline-flex;">${icons.stress}</span>
+              <span>2-Minute Reset</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Philosophy Bento Card -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title" style="display: flex; align-items: center; gap: 8px;">
+              <span class="squircle-icon squircle-mint" style="width: 28px; height: 28px; font-size: 14px; border-radius: 8px;">🌱</span>
+              <span>Core Principles</span>
+            </h3>
+          </div>
+          <div style="font-size: var(--font-size-sm); color: var(--color-text-muted); line-height: 1.7; display: flex; flex-direction: column; gap: 4px;">
+            <div><strong style="color: var(--color-text-main);">1. Work</strong> deserves focus.</div>
+            <div><strong style="color: var(--color-text-main);">2. Rest</strong> deserves permission.</div>
+            <div><strong style="color: var(--color-text-main);">3. Life</strong> deserves the remaining time.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Quick Links Section (Bento Card Launchpad) -->
       <div class="card">
         <div class="card-header">
           <div>
-            <h3 class="card-title">🔗 Quick Launch Links</h3>
-            <div style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: 2px;">
-              Fast launchpad for external corporate tools and spreadsheets.
+            <h3 class="card-title" style="display: flex; align-items: center; gap: 8px;">
+              <span class="squircle-icon squircle-amber" style="width: 28px; height: 28px; font-size: 14px; border-radius: 8px;">⚡</span>
+              <span>Quick Launch Links</span>
+            </h3>
+            <div style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: 4px;">
+              Fast launchpad for external corporate tools, portals, and spreadsheets.
             </div>
           </div>
           <button class="btn btn-xs btn-primary" id="btn-home-add-link">+ Add Link</button>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--space-3); margin-top: var(--space-2);">
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-3); margin-top: var(--space-2);">
           ${links.map(l => `
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: var(--space-2) var(--space-3); background-color: var(--color-bg-subtle); border-radius: var(--radius-md); border: 1px solid var(--color-border);">
-              <a href="${escapeHtml(l.url)}" target="_blank" rel="noopener" style="display: flex; align-items: center; gap: 6px; text-decoration: none; color: var(--color-text-main); font-weight: 500; font-size: var(--font-size-sm); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
-                <span>${escapeHtml(l.icon || '🔗')}</span>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background-color: var(--color-bg-subtle); border-radius: var(--radius-lg); border: 1px solid var(--color-border); transition: all var(--transition-fast);">
+              <a href="${escapeHtml(l.url)}" target="_blank" rel="noopener" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--color-text-main); font-weight: 500; font-size: var(--font-size-sm); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
+                <span style="font-size: 16px;">${escapeHtml(l.icon || '🔗')}</span>
                 <span style="overflow: hidden; text-overflow: ellipsis;">${escapeHtml(l.name)}</span>
               </a>
-              <button class="btn-icon btn-xs btn-delete-quicklink" data-id="${escapeHtml(l.id)}" title="Delete link" style="color: var(--color-text-subtle);">✕</button>
+              <button class="btn-icon btn-xs btn-delete-quicklink" data-id="${escapeHtml(l.id)}" title="Delete link" style="color: var(--color-text-subtle);">${icons.close}</button>
             </div>
           `).join('')}
         </div>

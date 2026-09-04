@@ -1,9 +1,10 @@
-﻿/**
+/**
  * js/widgets/emails.js - Emails Attention & Preparation Widget with Full Email ID Support
  */
 
 import * as store from '../store.js';
 import { escapeHtml, emptyStateHtml, showModal } from '../ui.js';
+import { icons } from '../icons.js';
 
 export const widget = {
   name: 'emails',
@@ -17,8 +18,11 @@ export const widget = {
     container.innerHTML = `
       <div class="widget-card">
         <div class="widget-header">
-          <div class="widget-title">✉️ Emails</div>
-          <button class="btn-icon btn-xs" id="widget-add-email" title="Add email">+</button>
+          <div class="widget-title">
+            <span style="display: inline-flex; align-items: center; color: var(--color-primary);">${icons.emails}</span>
+            <span>Emails</span>
+          </div>
+          <button class="btn-icon btn-xs" id="widget-add-email" title="Add email">${icons.plus}</button>
         </div>
         <div class="widget-body">
           ${activeEmails.length === 0 

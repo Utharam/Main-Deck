@@ -21,6 +21,7 @@ import { widget as emailsWidget } from './widgets/emails.js';
 import { widget as meetingsWidget } from './widgets/meetings.js';
 import { widget as remindersWidget } from './widgets/reminders.js';
 import { widget as dayssinceWidget } from './widgets/dayssince.js';
+import { widget as photoframeWidget } from './widgets/photoframe.js';
 
 // Header & Footer Special Docks
 import { widget as weatherWidget } from './widgets/weather.js';
@@ -37,14 +38,15 @@ const routes = {
   settings: settingsPage
 };
 
-// Right Rail Widgets: Focus Tasks, Calls, Emails, Meetings, Reminders, Days Since
+// Right Rail Widgets: Focus Tasks, Calls, Emails, Meetings, Reminders, Days Since, Photo Frame
 const registeredRightWidgets = [
   tasksWidget,
   callsWidget,
   emailsWidget,
   meetingsWidget,
   remindersWidget,
-  dayssinceWidget
+  dayssinceWidget,
+  photoframeWidget
 ];
 
 /**
@@ -103,7 +105,9 @@ async function init() {
     await store.initializeDefaults();
 
     // 4. Load theme
-    const theme = await store.getSetting('theme', 'light');
+    let theme = await store.getSetting('theme', 'pastel-green');
+    if (theme === 'light') theme = 'pastel-green';
+    if (theme === 'dark') theme = 'midnight-dark';
     document.documentElement.setAttribute('data-theme', theme);
 
     // 5. Load quirk (daily auto or user-selected)
@@ -265,7 +269,30 @@ async function openReadMeModal() {
 async function handleRoute() {
   const rawHash = window.location.hash.replace(/^#/, '') || 'home';
   const routeKey = rawHash.split('?')[0] || 'home';
+
+  // Backwards compatibility: gracefully redirect #phases to #projects
+  if (routeKey === 'phases') {
+    const urlParams = new URLSearchParams(rawHash.split('?')[1] || '');
+    const projId = urlParams.get('projectId') || urlParams.get('id');
+    window.location.hash = projId ? `#projects?id=${projId}` : '#projects';
+    return;
+  }
+
   const routeModule = routes[routeKey] || homePage;
+
+  const routeTitles = {
+    home: { title: 'Dashboard ⚓', sub: 'Personal Control Surface' },
+    projects: { title: 'Projects 📋', sub: 'Structured Goals & Milestones' },
+    notes: { title: 'Notes 📝', sub: 'Instant Context & Ideas' },
+    sop: { title: 'SOP 📚', sub: 'Standard Operating Procedures' },
+    stressbuster: { title: 'Stress Buster 🎮', sub: '2-Minute Micro Resets' },
+    settings: { title: 'Settings ⚙️', sub: 'Preferences & Local Storage' }
+  };
+  const titleInfo = routeTitles[routeKey] || routeTitles.home;
+  const headingEl = document.getElementById('header-page-title');
+  const subEl = document.getElementById('header-page-sub');
+  if (headingEl) headingEl.textContent = titleInfo.title;
+  if (subEl) subEl.textContent = titleInfo.sub;
 
   document.querySelectorAll('.nav-item').forEach((item) => {
     const itemHref = item.getAttribute('href') || '';

@@ -68,11 +68,15 @@ export async function render(container) {
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="setting-theme">Appearance Theme</label>
+              <label class="form-label" for="setting-theme">Appearance Palette</label>
               <select id="setting-theme">
-                <option value="light" ${settings.theme === 'light' ? 'selected' : ''}>Calm Light</option>
-                <option value="dark" ${settings.theme === 'dark' ? 'selected' : ''}>Focused Dark</option>
+                <option value="pastel-green" ${(settings.theme === 'pastel-green' || settings.theme === 'light' || !settings.theme) ? 'selected' : ''}>🌿 Soft Pastel Green (Morning Breeze)</option>
+                <option value="sage-green" ${settings.theme === 'sage-green' ? 'selected' : ''}>🍃 Executive Sage (Grounding Focus)</option>
+                <option value="warm-clay" ${settings.theme === 'warm-clay' ? 'selected' : ''}>🏺 Warm Clay & Sand (Cozy Earth)</option>
+                <option value="calm-light" ${settings.theme === 'calm-light' ? 'selected' : ''}>☁️ Calm Studio (Clean & Minimal)</option>
+                <option value="midnight-dark" ${(settings.theme === 'midnight-dark' || settings.theme === 'dark') ? 'selected' : ''}>🌘 Midnight Forest (Deep Night)</option>
               </select>
+              <span class="form-help">Select to preview instantly.</span>
             </div>
 
             <div class="form-group">
@@ -210,6 +214,13 @@ export async function render(container) {
   `;
 
   // --- Handlers for SECTION 1: Preferences & Profile ---
+  const themeSelect = container.querySelector('#setting-theme');
+  if (themeSelect) {
+    themeSelect.addEventListener('change', (e) => {
+      document.documentElement.setAttribute('data-theme', e.target.value);
+    });
+  }
+
   const formPref = container.querySelector('#form-preferences');
   if (formPref) {
     formPref.addEventListener('submit', async (e) => {

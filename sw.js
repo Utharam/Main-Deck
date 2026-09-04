@@ -3,7 +3,7 @@
  * Caches app shell for offline-first, network-first for API calls.
  */
 
-const CACHE_NAME = 'maindeck-v1';
+const CACHE_NAME = 'maindeck-v4';
 
 const APP_SHELL = [
   './',
@@ -14,6 +14,7 @@ const APP_SHELL = [
   './css/layout.css',
   './css/components.css',
   './js/app.js',
+  './js/icons.js',
   './js/db.js',
   './js/store.js',
   './js/ui.js',
@@ -30,6 +31,7 @@ const APP_SHELL = [
   './js/widgets/meetings.js',
   './js/widgets/reminders.js',
   './js/widgets/dayssince.js',
+  './js/widgets/photoframe.js',
   './js/widgets/weather.js',
   './js/widgets/stress.js',
   './js/widgets/messages.js',

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * js/widgets/stress.js - Stress Meter Widget (Pixel-Perfect End-to-End Slider)
  */
 
@@ -13,17 +13,17 @@ export const widget = {
     let stressScore = await store.getSetting('stressScore', 20);
 
     const getSliderConfig = (val) => {
-      if (val > 75) return { msg: '🔥 Take a breath.', color: '#ef4444' };
-      if (val > 50) return { msg: '😬 One thing at a time.', color: '#f59e0b' };
-      if (val > 25) return { msg: '🙂 Busy, but manageable.', color: '#0284c7' };
-      return { msg: '😌 Keep this energy.', color: '#22c55e' };
+      if (val > 75) return { msg: 'Take a breath.', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)' };
+      if (val > 50) return { msg: 'One step at a time.', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)' };
+      if (val > 25) return { msg: 'Busy, manageable.', color: '#0284c7', bg: 'rgba(2, 132, 199, 0.12)' };
+      return { msg: 'Calm & focused.', color: '#10b981', bg: 'rgba(16, 185, 129, 0.12)' };
     };
 
     const initialConfig = getSliderConfig(stressScore);
 
     container.innerHTML = `
       <div style="display: flex; align-items: center; gap: 8px; font-size: var(--font-size-xs); user-select: none;">
-        <span style="font-size: 1rem; cursor: pointer;" id="btn-stress-min" title="Set to 0 (Calm)">🧘</span>
+        <span style="font-size: 0.85rem; cursor: pointer; opacity: 0.7; transition: opacity var(--transition-fast);" id="btn-stress-min" title="Set to 0 (Calm)">🌿</span>
         
         <!-- Custom Pixel-Perfect Slider Track -->
         <div 
@@ -36,8 +36,8 @@ export const widget = {
           title="Click or drag to set your stress level"
           style="
             position: relative;
-            width: 180px;
-            height: 10px;
+            width: 160px;
+            height: 6px;
             background-color: var(--color-border);
             border-radius: 9999px;
             cursor: pointer;
@@ -69,25 +69,25 @@ export const widget = {
               position: absolute;
               left: ${stressScore}%;
               transform: translateX(-${stressScore}%);
-              width: 18px;
-              height: 18px;
+              width: 14px;
+              height: 14px;
               border-radius: 50%;
               background: #ffffff;
-              border: 2.5px solid ${initialConfig.color};
-              box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+              border: 2px solid ${initialConfig.color};
+              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
               pointer-events: none;
               transition: border-color 150ms ease;
             "
           ></div>
         </div>
 
-        <span style="font-size: 1rem; cursor: pointer;" id="btn-stress-max" title="Set to 100 (Overwhelmed)">🔥</span>
+        <span style="font-size: 0.85rem; cursor: pointer; opacity: 0.7; transition: opacity var(--transition-fast);" id="btn-stress-max" title="Set to 100 (High Stress)">⚡</span>
         
         <!-- Score Badge -->
         <span 
           id="footer-stress-badge" 
           class="badge" 
-          style="background-color: ${initialConfig.color}22; color: ${initialConfig.color}; font-weight: 700; min-width: 32px; text-align: center; font-variant-numeric: tabular-nums;"
+          style="background-color: ${initialConfig.bg}; color: ${initialConfig.color}; border: 1px solid var(--color-border); font-weight: 700; min-width: 28px; text-align: center; font-variant-numeric: tabular-nums; font-size: 11px;"
         >
           ${stressScore}
         </span>
@@ -131,7 +131,7 @@ export const widget = {
 
       if (badge) {
         badge.textContent = val;
-        badge.style.backgroundColor = `${config.color}22`;
+        badge.style.backgroundColor = config.bg;
         badge.style.color = config.color;
       }
 

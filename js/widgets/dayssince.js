@@ -1,4 +1,4 @@
-﻿/**
+/**
  * js/widgets/dayssince.js - Days Since Activity Tracker
  * Not a streak system. Just a quiet statement of fact: "It's been X days."
  */
@@ -6,6 +6,7 @@
 import * as store from '../store.js';
 import { escapeHtml, emptyStateHtml, showModal } from '../ui.js';
 import { calculateDaysSince } from '../utils/time.js';
+import { icons } from '../icons.js';
 
 const DEFAULT_ACTIVITIES = [
   { id: 'act-1', name: 'Called Mom / Family', icon: '📞', lastDate: new Date(Date.now() - 4 * 86400000).toISOString() },
@@ -31,8 +32,11 @@ export const widget = {
     container.innerHTML = `
       <div class="widget-card">
         <div class="widget-header">
-          <div class="widget-title">🕐 Days Since</div>
-          <button class="btn-icon btn-xs" id="widget-add-activity" title="Add activity">+</button>
+          <div class="widget-title">
+            <span style="display: inline-flex; align-items: center; color: var(--color-primary);">${icons.dayssince}</span>
+            <span>Days Since</span>
+          </div>
+          <button class="btn-icon btn-xs" id="widget-add-activity" title="Add activity">${icons.plus}</button>
         </div>
         <div class="widget-body">
           ${activities.length === 0 

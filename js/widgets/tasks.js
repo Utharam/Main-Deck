@@ -1,9 +1,10 @@
-﻿/**
+/**
  * js/widgets/tasks.js - Focus Tasks Attention Widget
  */
 
 import * as store from '../store.js';
 import { escapeHtml, emptyStateHtml, showModal } from '../ui.js';
+import { icons } from '../icons.js';
 
 export const widget = {
   name: 'tasks',
@@ -17,10 +18,13 @@ export const widget = {
     container.innerHTML = `
       <div class="widget-card">
         <div class="widget-header">
-          <div class="widget-title">📋 Focus Tasks</div>
+          <div class="widget-title">
+            <span style="display: inline-flex; align-items: center; color: var(--color-primary);">${icons.tasks}</span>
+            <span>Focus Tasks</span>
+          </div>
           <div style="display: flex; gap: 4px; align-items: center;">
-            <button class="btn-icon btn-xs" id="widget-add-task" title="Add task">+</button>
-            <a href="#projects" class="btn-icon btn-xs" title="Manage Projects & Phases">↗</a>
+            <button class="btn-icon btn-xs" id="widget-add-task" title="Add task">${icons.plus}</button>
+            <a href="#projects" class="btn-icon btn-xs" title="Manage Projects & Phases">${icons.external}</a>
           </div>
         </div>
         <div class="widget-body" id="widget-tasks-list">
@@ -32,7 +36,7 @@ export const widget = {
                   <input type="checkbox" class="widget-task-check" data-id="${escapeHtml(t.id)}" />
                   <span style="font-size: var(--font-size-sm);">${escapeHtml(t.title)}</span>
                 </label>
-                <button class="btn-icon btn-xs widget-task-delete" data-id="${escapeHtml(t.id)}" title="Delete">✕</button>
+                <button class="btn-icon btn-xs widget-task-delete" data-id="${escapeHtml(t.id)}" title="Delete">${icons.close}</button>
               </div>
             `).join('')}
         </div>

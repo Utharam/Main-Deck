@@ -1,9 +1,10 @@
-﻿/**
+/**
  * js/widgets/meetings.js - Upcoming Meetings Attention Widget
  */
 
 import * as store from '../store.js';
 import { escapeHtml, emptyStateHtml, showModal } from '../ui.js';
+import { icons } from '../icons.js';
 
 export const widget = {
   name: 'meetings',
@@ -17,8 +18,11 @@ export const widget = {
     container.innerHTML = `
       <div class="widget-card">
         <div class="widget-header">
-          <div class="widget-title">👥 Meetings</div>
-          <button class="btn-icon btn-xs" id="widget-add-meeting" title="Add meeting">+</button>
+          <div class="widget-title">
+            <span style="display: inline-flex; align-items: center; color: var(--color-primary);">${icons.meetings}</span>
+            <span>Meetings</span>
+          </div>
+          <button class="btn-icon btn-xs" id="widget-add-meeting" title="Add meeting">${icons.plus}</button>
         </div>
         <div class="widget-body">
           ${activeMeetings.length === 0 

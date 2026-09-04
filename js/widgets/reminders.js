@@ -1,9 +1,10 @@
-﻿/**
+/**
  * js/widgets/reminders.js - Timed Reminders Attention Widget
  */
 
 import * as store from '../store.js';
 import { escapeHtml, emptyStateHtml, showModal } from '../ui.js';
+import { icons } from '../icons.js';
 import { sendNotification, requestNotificationPermission } from '../utils/notify.js';
 
 export const widget = {
@@ -18,8 +19,11 @@ export const widget = {
     container.innerHTML = `
       <div class="widget-card">
         <div class="widget-header">
-          <div class="widget-title">🔔 Reminders</div>
-          <button class="btn-icon btn-xs" id="widget-add-reminder" title="Add reminder">+</button>
+          <div class="widget-title">
+            <span style="display: inline-flex; align-items: center; color: var(--color-primary);">${icons.reminders}</span>
+            <span>Reminders</span>
+          </div>
+          <button class="btn-icon btn-xs" id="widget-add-reminder" title="Add reminder">${icons.plus}</button>
         </div>
         <div class="widget-body">
           ${activeReminders.length === 0 
