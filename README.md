@@ -121,7 +121,7 @@ python -m http.server 8000
 
 ## 👤 Author & Attribution
 
-Created by [**Utharam**](https://utharam.github.io/)
+Created by [**Utharam**](https://utharam.in)
 
 ---
 
