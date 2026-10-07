@@ -1,4 +1,4 @@
-﻿/**
+/**
  * js/utils/time.js - Date & Time Utilities
  */
 
@@ -37,6 +37,31 @@ export function formatDate(dateVal) {
   if (diffDays === -1) return 'Yesterday';
 
   return d.toLocaleDateString([], { day: 'numeric', month: 'short' });
+}
+
+/**
+ * Format timestamp into relative time string (e.g. "Just now", "5m ago", "2h ago", "Yesterday", "3d ago")
+ * @param {string|number|Date} dateVal 
+ * @returns {string}
+ */
+export function formatRelativeTime(dateVal) {
+  if (!dateVal) return '';
+  const d = new Date(dateVal);
+  if (isNaN(d.getTime())) return '';
+
+  const now = Date.now();
+  const diffSec = Math.floor((now - d.getTime()) / 1000);
+
+  if (diffSec < 60) return 'Just now';
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHours = Math.floor(diffMin / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 30) return `${diffDays}d ago`;
+
+  return formatDate(dateVal);
 }
 
 /**

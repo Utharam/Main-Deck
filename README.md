@@ -68,6 +68,13 @@ Main Deck is a fully installable **PWA**:
 - Zero streak pressure, zero penalties — factual record of key personal activities (*Called Mom*, *Exercised*, *Read a book*).
 - Click 🔄 to reset to today.
 
+### 📌 Sticky Notes Board
+- **Quick Throw Brain Dumps**: Rapidly capture random thoughts, phone numbers, and unstructured ideas with zero friction (`Enter` or click to throw).
+- **Disappearing Timers**: Configurable auto-expiry from 1 to 7 days (or turned off for permanent stickies) with live time-remaining countdown badges.
+- **Priority Selector & Pastel Themes**: Tag notes with optional priority (Low, Medium, High, Urgent) and 6 cozy pastel shades (Lemon, Peach, Mint, Sky, Lilac, Rose).
+- **Freeform Canvas & Auto-Grid Rearrangement**: Freely drag, stack, and reposition stickies anywhere, or click **Rearrange to Grid** to snap everything into a clean layout.
+- **Quick 1-Click Delete**: Swift `✕` dismissal with smooth dissolve animation.
+
 ### 📞 Work Attention Rail
 - Dedicated right-side widgets for Calls, Emails (with multi-ID mailto links), Meetings, and Snoozeable Reminders.
 

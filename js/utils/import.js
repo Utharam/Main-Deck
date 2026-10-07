@@ -1,4 +1,4 @@
-﻿/**
+/**
  * js/utils/import.js - Backup Restore & Selective Import Engine
  */
 
@@ -96,6 +96,9 @@ async function restoreFullBackup(data) {
   }
   if (Array.isArray(data.activities)) {
     for (const item of data.activities) await store.saveActivity(item);
+  }
+  if (Array.isArray(data.stickies)) {
+    for (const item of data.stickies) await store.saveSticky(item);
   }
 
   await store.recordBackup();

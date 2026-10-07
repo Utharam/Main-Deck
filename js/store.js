@@ -317,3 +317,102 @@ export async function deleteMessage(id) {
   return await db.remove('messages', id);
 }
 
+/* ==================== STICKY NOTES ==================== */
+
+/**
+ * Get all sticky notes, auto-purging any that have passed their disappearing timer.
+ * @returns {Promise<any[]>}
+ */
+export async function getStickies() {
+  const all = await db.getAll('stickies');
+  const now = Date.now();
+  const valid = [];
+  const expiredIds = [];
+
+  for (const s of all) {
+    if (s.expiresAt && new Date(s.expiresAt).getTime() <= now) {
+      expiredIds.push(s.id);
+    } else {
+      valid.push(s);
+    }
+  }
+
+  // Cleanup expired stickies asynchronously in the background
+  if (expiredIds.length > 0) {
+    for (const id of expiredIds) {
+      db.remove('stickies', id).catch(() => {});
+    }
+  }
+
+  return valid;
+}
+
+/**
+ * Save or update a single sticky note.
+ * Automatically computes `expiresAt` if `expiryDays` (1 to 7) is provided.
+ * @param {object} sticky
+ * @returns {Promise<object>}
+ */
+export async function saveSticky(sticky) {
+  if (!sticky.id) sticky.id = generateId();
+  const now = new Date();
+  if (!sticky.createdAt) sticky.createdAt = now.toISOString();
+  sticky.updatedAt = now.toISOString();
+
+  // If expiryDays is provided (1-7), calculate expiresAt; if null or 0, timer is turned off
+  if (sticky.expiryDays && Number(sticky.expiryDays) > 0) {
+    const days = Number(sticky.expiryDays);
+    const expireTime = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
+    sticky.expiresAt = expireTime.toISOString();
+  } else if (sticky.expiryDays === 0 || sticky.expiryDays === null) {
+    sticky.expiresAt = null;
+  }
+
+  // Defaults
+  if (typeof sticky.zIndex !== 'number') sticky.zIndex = 1;
+  if (!sticky.priority) sticky.priority = 'none';
+  if (!sticky.color) sticky.color = 'yellow';
+
+  await db.put('stickies', sticky);
+  return sticky;
+}
+
+/**
+ * Delete a sticky note immediately.
+ * @param {string} id
+ */
+export async function deleteSticky(id) {
+  return await db.remove('stickies', id);
+}
+
+/**
+ * Batch save multiple stickies (e.g. after grid rearrangement or bulk stacking updates).
+ * @param {object[]} stickies
+ */
+export async function batchSaveStickies(stickies) {
+  if (!stickies || stickies.length === 0) return;
+  await db.withStore('stickies', 'readwrite', (store) => {
+    for (const item of stickies) {
+      store.put(item);
+    }
+  });
+}
+
+/**
+ * Sweep and purge expired stickies explicitly.
+ * @returns {Promise<number>} Number of purged stickies
+ */
+export async function cleanupExpiredStickies() {
+  const all = await db.getAll('stickies');
+  const now = Date.now();
+  let count = 0;
+  for (const s of all) {
+    if (s.expiresAt && new Date(s.expiresAt).getTime() <= now) {
+      await db.remove('stickies', s.id);
+      count++;
+    }
+  }
+  return count;
+}
+
+

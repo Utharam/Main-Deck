@@ -1,10 +1,10 @@
-﻿/**
+/**
  * js/db.js - IndexedDB Core Foundation for The Workbench
  * Version: 1
  */
 
 const DB_NAME = 'workbench';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 let dbInstance = null;
 
@@ -119,6 +119,14 @@ export async function initDB() {
       // 14. meta: (key) - metadata like lastBackupTime, installDate
       if (!db.objectStoreNames.contains('meta')) {
         db.createObjectStore('meta', { keyPath: 'key' });
+      }
+
+      // 15. stickies: (id, priority, createdAt, expiresAt)
+      if (!db.objectStoreNames.contains('stickies')) {
+        const stickiesStore = db.createObjectStore('stickies', { keyPath: 'id' });
+        stickiesStore.createIndex('priority', 'priority', { unique: false });
+        stickiesStore.createIndex('createdAt', 'createdAt', { unique: false });
+        stickiesStore.createIndex('expiresAt', 'expiresAt', { unique: false });
       }
     };
 

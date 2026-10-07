@@ -1,4 +1,4 @@
-﻿/**
+/**
  * js/utils/export.js - Full & Selective Export Utilities (Main Deck)
  */
 
@@ -28,6 +28,7 @@ export async function exportFullBackup() {
   const reminders = await store.getReminders();
   const activities = await store.getActivities();
   const messages = await store.getMessages();
+  const stickies = await store.getStickies();
 
   const backupPayload = {
     format: 'workbench',
@@ -46,7 +47,8 @@ export async function exportFullBackup() {
       meetings,
       reminders,
       activities,
-      messages
+      messages,
+      stickies
     }
   };
 

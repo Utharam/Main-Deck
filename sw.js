@@ -3,7 +3,7 @@
  * Caches app shell for offline-first, network-first for API calls.
  */
 
-const CACHE_NAME = 'maindeck-v4';
+const CACHE_NAME = 'maindeck-v4.2.1';
 
 const APP_SHELL = [
   './',
@@ -22,6 +22,7 @@ const APP_SHELL = [
   './js/pages/projects.js',
   './js/pages/phases.js',
   './js/pages/notes.js',
+  './js/pages/stickies.js',
   './js/pages/sop.js',
   './js/pages/stressbuster.js',
   './js/pages/settings.js',

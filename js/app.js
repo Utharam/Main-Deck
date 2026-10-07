@@ -10,6 +10,7 @@ import * as homePage from './pages/home.js';
 import * as projectsPage from './pages/projects.js';
 import * as phasesPage from './pages/phases.js';
 import * as notesPage from './pages/notes.js';
+import * as stickiesPage from './pages/stickies.js';
 import * as sopPage from './pages/sop.js';
 import * as stressbusterPage from './pages/stressbuster.js';
 import * as settingsPage from './pages/settings.js';
@@ -33,6 +34,7 @@ const routes = {
   projects: projectsPage,
   phases: phasesPage,
   notes: notesPage,
+  stickies: stickiesPage,
   sop: sopPage,
   stressbuster: stressbusterPage,
   settings: settingsPage
@@ -284,6 +286,7 @@ async function handleRoute() {
     home: { title: 'Dashboard ⚓', sub: 'Personal Control Surface' },
     projects: { title: 'Projects 📋', sub: 'Structured Goals & Milestones' },
     notes: { title: 'Notes 📝', sub: 'Instant Context & Ideas' },
+    stickies: { title: 'Sticky Notes 📌', sub: 'Quick Dumps & Disappearing Timers' },
     sop: { title: 'SOP 📚', sub: 'Standard Operating Procedures' },
     stressbuster: { title: 'Stress Buster 🎮', sub: '2-Minute Micro Resets' },
     settings: { title: 'Settings ⚙️', sub: 'Preferences & Local Storage' }
@@ -357,6 +360,7 @@ function setupSearch() {
 async function openGlobalSearch() {
   const tasks = await store.getTasks();
   const notes = await store.getNotes();
+  const stickies = await store.getStickies();
   const sops = await store.getSOPs();
   const projects = await store.getProjects();
 
@@ -364,7 +368,7 @@ async function openGlobalSearch() {
     title: '🔍 Quick Search',
     contentHtml: `
       <div class="form-group">
-        <input type="text" id="search-input" placeholder="Type to search tasks, notes, SOPs, projects..." autofocus style="font-size: var(--font-size-md);" />
+        <input type="text" id="search-input" placeholder="Type to search tasks, notes, stickies, SOPs, projects..." autofocus style="font-size: var(--font-size-md);" />
       </div>
       <div id="search-results" style="display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-3); max-height: 350px; overflow-y: auto;">
         <div style="font-size: var(--font-size-xs); color: var(--color-text-muted);">Type anything to find items.</div>
@@ -389,10 +393,11 @@ async function openGlobalSearch() {
 
       const matchTasks = tasks.filter(t => t.title.toLowerCase().includes(q));
       const matchNotes = notes.filter(n => n.title.toLowerCase().includes(q) || (n.content && n.content.toLowerCase().includes(q)));
+      const matchStickies = stickies.filter(s => s.text && s.text.toLowerCase().includes(q));
       const matchSops = sops.filter(s => s.title.toLowerCase().includes(q) || (s.description && s.description.toLowerCase().includes(q)));
       const matchProjects = projects.filter(p => p.name.toLowerCase().includes(q));
 
-      const totalMatches = matchTasks.length + matchNotes.length + matchSops.length + matchProjects.length;
+      const totalMatches = matchTasks.length + matchNotes.length + matchStickies.length + matchSops.length + matchProjects.length;
 
       if (totalMatches === 0) {
         resultsContainer.innerHTML = '<div class="empty-state">No matching items found.</div>';
@@ -412,6 +417,13 @@ async function openGlobalSearch() {
         html += `<div style="font-size: var(--font-size-xs); font-weight: 600; text-transform: uppercase; color: var(--color-text-subtle); margin-top: 6px;">Tasks</div>`;
         matchTasks.forEach(t => {
           html += `<a href="#projects" class="kv-row search-item" style="display: block; padding: 6px; border-radius: 4px; text-decoration: none;">📋 ${escapeHtml(t.title)}</a>`;
+        });
+      }
+
+      if (matchStickies.length > 0) {
+        html += `<div style="font-size: var(--font-size-xs); font-weight: 600; text-transform: uppercase; color: var(--color-text-subtle); margin-top: 6px;">Sticky Notes</div>`;
+        matchStickies.forEach(s => {
+          html += `<a href="#stickies" class="kv-row search-item" style="display: block; padding: 6px; border-radius: 4px; text-decoration: none;">📌 ${escapeHtml(s.text.slice(0, 60))}${s.text.length > 60 ? '...' : ''}</a>`;
         });
       }
 

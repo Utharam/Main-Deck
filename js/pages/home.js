@@ -194,6 +194,10 @@ export async function render(container) {
               <span style="display: inline-flex;">${icons.notes}</span>
               <span>Notes</span>
             </a>
+            <a href="#stickies" class="btn btn-secondary btn-sm" style="gap: 8px;">
+              <span style="display: inline-flex;">${icons.pin || '📌'}</span>
+              <span>Sticky Notes</span>
+            </a>
             <a href="#stressbuster" class="btn btn-secondary btn-sm" style="gap: 8px;">
               <span style="display: inline-flex;">${icons.stress}</span>
               <span>2-Minute Reset</span>

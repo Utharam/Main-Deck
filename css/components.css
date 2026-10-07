@@ -946,4 +946,53 @@ kbd {
   min-width: 52px;
 }
 
+/* ============================================================
+   Sticky Notes Board Component Styles
+   ============================================================ */
+.sticky-page-wrapper {
+  max-width: 100%;
+}
+
+.sticky-board-viewport {
+  transition: min-height 0.3s ease;
+}
+
+.sticky-board-viewport.grid-mode .sticky-grid-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+.sticky-board-viewport.grid-mode .sticky-note-card {
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  transform: none !important;
+  width: 100% !important;
+}
+
+.sticky-note-card:hover {
+  box-shadow: 0 14px 30px -6px rgba(0, 0, 0, 0.12), 0 6px 12px -3px rgba(0, 0, 0, 0.06);
+}
+
+.sticky-color-swatch:hover {
+  transform: scale(1.2);
+}
+
+.sticky-color-swatch.active {
+  transform: scale(1.25);
+  box-shadow: 0 0 0 2px var(--color-bg-surface), 0 0 0 4px var(--color-primary);
+}
+
+.sticky-priority-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.sticky-priority-btn.active:hover {
+  color: #ffffff !important;
+}
+
+
 
