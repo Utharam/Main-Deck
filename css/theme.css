@@ -354,6 +354,66 @@
 }
 
 /* ============================================================
+   STICKY NOTES + PRIORITY PALETTE
+   Sticky colours are intentionally invariant across the 4 light
+   themes: a note should look like the same note in Sage Green as
+   it does in Warm Clay. Declared after every theme block so these
+   win on source order without 4x copy-paste duplication.
+   Colours are consumed via data-color attributes, never from JS.
+   ============================================================ */
+:root,
+[data-theme="light"],
+[data-theme="pastel-green"],
+[data-theme="sage-green"],
+[data-theme="warm-clay"],
+[data-theme="calm-light"] {
+
+  /* 6th squircle token - previously referenced as var(--pastel-lemon-bg, ...)
+     but never defined, so the fallback always fired. */
+  --pastel-lemon-bg: #fef5e6;
+  --pastel-lemon-border: #fde4ba;
+  --pastel-lemon-text: #b45309;
+
+  /* Sticky note surfaces (light). Text colours are >=700 shades:
+     7.0:1 - 10.1:1 against their own background. */
+  --sticky-yellow-bg: #fef9c3;  --sticky-yellow-border: #fef08a;  --sticky-yellow-text: #713f12;  --sticky-yellow-tape: rgba(234, 179, 8, 0.25);
+  --sticky-peach-bg:  #fdeee3;  --sticky-peach-border:  #fad5bf;  --sticky-peach-text:  #7c2d12;  --sticky-peach-tape:  rgba(249, 115, 22, 0.25);
+  --sticky-mint-bg:   #e7f7ed;  --sticky-mint-border:   #c4ebd1;  --sticky-mint-text:   #14532d;  --sticky-mint-tape:   rgba(34, 197, 94, 0.25);
+  --sticky-sky-bg:    #e7f4fe;  --sticky-sky-border:    #c7e5fc;  --sticky-sky-text:    #0c4a6e;  --sticky-sky-tape:    rgba(14, 165, 233, 0.25);
+  --sticky-lilac-bg:  #eee9fc;  --sticky-lilac-border:  #ded4fa;  --sticky-lilac-text:  #4c1d95;  --sticky-lilac-tape:  rgba(168, 85, 247, 0.25);
+  --sticky-rose-bg:   #fce7f3;  --sticky-rose-border:   #fbcfe8;  --sticky-rose-text:   #831843;  --sticky-rose-tape:   rgba(236, 72, 153, 0.25);
+
+  /* Priority text/dot. The text shades clear 4.5:1 both on --color-bg-surface
+     and on their matching -subtle tint. */
+  --priority-urgent-text: #991b1b; --priority-urgent-dot: #dc2626;
+  --priority-high-text:   #9a3412; --priority-high-dot:   #ea580c;
+  --priority-medium-text: #92400e; --priority-medium-dot: #d97706;
+  --priority-low-text:    #166534; --priority-low-dot:    #16a34a;
+}
+
+[data-theme="midnight-dark"], [data-theme="dark"] {
+
+  --pastel-lemon-bg: rgba(251, 191, 36, 0.15);
+  --pastel-lemon-border: rgba(251, 191, 36, 0.3);
+  --pastel-lemon-text: #fde047;
+
+  /* Sticky note surfaces (dark). Translucent tint over --color-bg-card with
+     light text: 7.2:1 - 10.1:1. Opaque pastels here would glow like lightboxes
+     on a dark surface. */
+  --sticky-yellow-bg: rgba(250, 204, 21, 0.14); --sticky-yellow-border: rgba(250, 204, 21, 0.32); --sticky-yellow-text: #fde68a; --sticky-yellow-tape: rgba(250, 204, 21, 0.28);
+  --sticky-peach-bg:  rgba(251, 146, 60, 0.14); --sticky-peach-border:  rgba(251, 146, 60, 0.32); --sticky-peach-text:  #fdba74; --sticky-peach-tape:  rgba(251, 146, 60, 0.28);
+  --sticky-mint-bg:   rgba(52, 211, 153, 0.14); --sticky-mint-border:   rgba(52, 211, 153, 0.32); --sticky-mint-text:  #6ee7b7; --sticky-mint-tape:   rgba(52, 211, 153, 0.28);
+  --sticky-sky-bg:    rgba(56, 189, 248, 0.14); --sticky-sky-border:    rgba(56, 189, 248, 0.32); --sticky-sky-text:   #7dd3fc; --sticky-sky-tape:    rgba(56, 189, 248, 0.28);
+  --sticky-lilac-bg:  rgba(155, 135, 245, 0.14); --sticky-lilac-border: rgba(155, 135, 245, 0.32); --sticky-lilac-text: #c4b5fd; --sticky-lilac-tape: rgba(155, 135, 245, 0.28);
+  --sticky-rose-bg:   rgba(236, 72, 153, 0.14); --sticky-rose-border:   rgba(236, 72, 153, 0.32); --sticky-rose-text:  #fbcfe8; --sticky-rose-tape:   rgba(236, 72, 153, 0.28);
+
+  --priority-urgent-text: #fca5a5; --priority-urgent-dot: #f87171;
+  --priority-high-text:   #fdba74; --priority-high-dot:   #fb923c;
+  --priority-medium-text: #fcd34d; --priority-medium-dot: #fbbf24;
+  --priority-low-text:    #86efac; --priority-low-dot:    #34d399;
+}
+
+/* ============================================================
    QUIRK THEMES — Subtle daily accent shifts
    Each quirk overrides only the primary accent color family.
    They layer on top of both light and dark base themes.
@@ -368,7 +428,7 @@
   --color-primary-subtle: rgba(99, 102, 241, 0.1);
   --color-primary-text: #4f46e5;
 }
-[data-theme="dark"][data-quirk="morning-fog"] {
+[data-theme="midnight-dark"], [data-theme="dark"][data-quirk="morning-fog"] {
   --color-primary: #818cf8;
   --color-primary-hover: #a5b4fc;
   --color-primary-subtle: rgba(129, 140, 248, 0.15);
@@ -382,7 +442,7 @@
   --color-primary-subtle: rgba(234, 88, 12, 0.1);
   --color-primary-text: #c2410c;
 }
-[data-theme="dark"][data-quirk="warm-clay"] {
+[data-theme="midnight-dark"], [data-theme="dark"][data-quirk="warm-clay"] {
   --color-primary: #fb923c;
   --color-primary-hover: #fdba74;
   --color-primary-subtle: rgba(251, 146, 60, 0.15);
@@ -396,7 +456,7 @@
   --color-primary-subtle: rgba(5, 150, 105, 0.1);
   --color-primary-text: #047857;
 }
-[data-theme="dark"][data-quirk="moss-garden"] {
+[data-theme="midnight-dark"], [data-theme="dark"][data-quirk="moss-garden"] {
   --color-primary: #34d399;
   --color-primary-hover: #6ee7b7;
   --color-primary-subtle: rgba(52, 211, 153, 0.15);
@@ -410,7 +470,7 @@
   --color-primary-subtle: rgba(217, 119, 6, 0.1);
   --color-primary-text: #b45309;
 }
-[data-theme="dark"][data-quirk="desert-wind"] {
+[data-theme="midnight-dark"], [data-theme="dark"][data-quirk="desert-wind"] {
   --color-primary: #fbbf24;
   --color-primary-hover: #fcd34d;
   --color-primary-subtle: rgba(251, 191, 36, 0.15);
@@ -424,7 +484,7 @@
   --color-primary-subtle: rgba(147, 51, 234, 0.1);
   --color-primary-text: #7e22ce;
 }
-[data-theme="dark"][data-quirk="plum-dusk"] {
+[data-theme="midnight-dark"], [data-theme="dark"][data-quirk="plum-dusk"] {
   --color-primary: #c084fc;
   --color-primary-hover: #d8b4fe;
   --color-primary-subtle: rgba(192, 132, 252, 0.15);
@@ -438,7 +498,7 @@
   --color-primary-subtle: rgba(71, 85, 105, 0.1);
   --color-primary-text: #334155;
 }
-[data-theme="dark"][data-quirk="steel-dawn"] {
+[data-theme="midnight-dark"], [data-theme="dark"][data-quirk="steel-dawn"] {
   --color-primary: #94a3b8;
   --color-primary-hover: #cbd5e1;
   --color-primary-subtle: rgba(148, 163, 184, 0.15);

@@ -8,26 +8,13 @@ import { escapeHtml, emptyStateHtml, showModal } from '../ui.js';
 import { calculateDaysSince } from '../utils/time.js';
 import { icons } from '../icons.js';
 
-const DEFAULT_ACTIVITIES = [
-  { id: 'act-1', name: 'Called Mom / Family', icon: '📞', lastDate: new Date(Date.now() - 4 * 86400000).toISOString() },
-  { id: 'act-2', name: 'Went to Gym / Exercise', icon: '🏋️', lastDate: new Date(Date.now() - 6 * 86400000).toISOString() },
-  { id: 'act-3', name: 'Read a Book', icon: '📖', lastDate: new Date(Date.now() - 12 * 86400000).toISOString() },
-  { id: 'act-4', name: 'Worked on Certification', icon: '🎓', lastDate: new Date(Date.now() - 3 * 86400000).toISOString() }
-];
-
 export const widget = {
   name: 'dayssince',
   label: 'Days Since',
   icon: '🕐',
 
   async render(container) {
-    let activities = await store.getActivities();
-    if (activities.length === 0) {
-      for (const act of DEFAULT_ACTIVITIES) {
-        await store.saveActivity(act);
-      }
-      activities = await store.getActivities();
-    }
+    const activities = await store.getActivities();
 
     container.innerHTML = `
       <div class="widget-card">

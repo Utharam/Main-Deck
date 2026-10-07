@@ -113,7 +113,7 @@
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
 }
 
-[data-theme="dark"] .card {
+[data-theme="midnight-dark"], [data-theme="dark"] .card {
   border-color: rgba(255, 255, 255, 0.08);
 }
 
@@ -149,7 +149,7 @@
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
 }
 
-[data-theme="dark"] .widget-card {
+[data-theme="midnight-dark"], [data-theme="dark"] .widget-card {
   border-color: rgba(255, 255, 255, 0.08);
 }
 
@@ -303,6 +303,21 @@
   border: 1px solid var(--pastel-amber-border);
 }
 
+.squircle-lemon {
+  background-color: var(--pastel-lemon-bg);
+  color: var(--pastel-lemon-text);
+  border: 1px solid var(--pastel-lemon-border);
+}
+
+/* Compact squircle for card headers, replacing 4 inline copies of
+   width/height/font-size/border-radius: 28px/28px/14px/8px. */
+.squircle-icon--sm {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-base);
+}
+
 /* Bento Stat Cards */
 .bento-stat-card {
   background-color: var(--color-bg-card);
@@ -316,7 +331,7 @@
   transition: all var(--transition-fast);
 }
 
-[data-theme="dark"] .bento-stat-card {
+[data-theme="midnight-dark"], [data-theme="dark"] .bento-stat-card {
   border-color: rgba(255, 255, 255, 0.08);
 }
 
@@ -972,8 +987,142 @@ kbd {
   width: 100% !important;
 }
 
+/* ---- Board sticky note card ----
+   Colours come from --sticky-* tokens via data-color, so a note is
+   theme-aware on both the board and the Home preview without JS hex. */
+.sticky-note-card {
+  width: 220px;
+  min-height: 160px;
+  border: 1px solid var(--sticky-border);
+  border-radius: 14px;
+  background: var(--sticky-bg);
+  color: var(--sticky-text);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 12px 14px;
+  cursor: grab;
+  user-select: none;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
 .sticky-note-card:hover {
-  box-shadow: 0 14px 30px -6px rgba(0, 0, 0, 0.12), 0 6px 12px -3px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-lg);
+}
+
+.sticky-note-card[data-color="yellow"] { --sticky-bg: var(--sticky-yellow-bg); --sticky-border: var(--sticky-yellow-border); --sticky-text: var(--sticky-yellow-text); --sticky-tape: var(--sticky-yellow-tape); }
+.sticky-note-card[data-color="peach"]  { --sticky-bg: var(--sticky-peach-bg);  --sticky-border: var(--sticky-peach-border);  --sticky-text: var(--sticky-peach-text);  --sticky-tape: var(--sticky-peach-tape); }
+.sticky-note-card[data-color="mint"]   { --sticky-bg: var(--sticky-mint-bg);   --sticky-border: var(--sticky-mint-border);   --sticky-text: var(--sticky-mint-text);   --sticky-tape: var(--sticky-mint-tape); }
+.sticky-note-card[data-color="sky"]    { --sticky-bg: var(--sticky-sky-bg);    --sticky-border: var(--sticky-sky-border);    --sticky-text: var(--sticky-sky-text);    --sticky-tape: var(--sticky-sky-tape); }
+.sticky-note-card[data-color="lilac"]  { --sticky-bg: var(--sticky-lilac-bg);  --sticky-border: var(--sticky-lilac-border);  --sticky-text: var(--sticky-lilac-text);  --sticky-tape: var(--sticky-lilac-tape); }
+.sticky-note-card[data-color="rose"]   { --sticky-bg: var(--sticky-rose-bg);   --sticky-border: var(--sticky-rose-border);   --sticky-text: var(--sticky-rose-text);   --sticky-tape: var(--sticky-rose-tape); }
+
+.sticky-tape {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 44px;
+  height: 16px;
+  background: var(--sticky-tape);
+  border-radius: 2px;
+  backdrop-filter: blur(1px);
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.sticky-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.sticky-priority-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-surface);
+  box-shadow: var(--shadow-xs);
+  color: var(--priority-text, var(--color-text-muted));
+  white-space: nowrap;
+}
+.sticky-priority-tag__dot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background: var(--priority-dot, currentColor);
+  flex-shrink: 0;
+}
+.sticky-priority-tag[data-priority="urgent"] { --priority-text: var(--priority-urgent-text); --priority-dot: var(--priority-urgent-dot); }
+.sticky-priority-tag[data-priority="high"]   { --priority-text: var(--priority-high-text);   --priority-dot: var(--priority-high-dot); }
+.sticky-priority-tag[data-priority="medium"] { --priority-text: var(--priority-medium-text); --priority-dot: var(--priority-medium-dot); }
+.sticky-priority-tag[data-priority="low"]    { --priority-text: var(--priority-low-text);    --priority-dot: var(--priority-low-dot); }
+
+.sticky-timer-tag {
+  font-size: var(--font-size-2xs);
+  color: var(--sticky-text);
+  opacity: 0.85;
+  font-weight: var(--font-weight-medium);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.btn-sticky-quick-delete {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--sticky-text);
+  opacity: 0.7;
+  transition: opacity 0.15s, background 0.15s;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  padding: 0;
+  line-height: 1;
+}
+.btn-sticky-quick-delete:hover { opacity: 1; background: var(--color-danger-subtle); }
+
+.sticky-card-body {
+  flex: 1;
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+  color: var(--sticky-text);
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-y: auto;
+  max-height: 160px;
+  padding: 2px 0;
+}
+
+.sticky-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--color-border);
+  font-size: var(--font-size-2xs);
+  color: var(--sticky-text);
+  opacity: 0.8;
+}
+
+.sticky-drag-hint {
+  opacity: 0.7;
+  font-size: var(--font-size-3xs);
 }
 
 .sticky-color-swatch:hover {
@@ -992,6 +1141,288 @@ kbd {
 
 .sticky-priority-btn.active:hover {
   color: #ffffff !important;
+}
+
+.sticky-color-swatch[data-color="yellow"] { background: var(--sticky-yellow-bg); border: 2px solid var(--sticky-yellow-border); }
+.sticky-color-swatch[data-color="peach"]  { background: var(--sticky-peach-bg);  border: 2px solid var(--sticky-peach-border); }
+.sticky-color-swatch[data-color="mint"]   { background: var(--sticky-mint-bg);   border: 2px solid var(--sticky-mint-border); }
+.sticky-color-swatch[data-color="sky"]    { background: var(--sticky-sky-bg);    border: 2px solid var(--sticky-sky-border); }
+.sticky-color-swatch[data-color="lilac"]  { background: var(--sticky-lilac-bg);  border: 2px solid var(--sticky-lilac-border); }
+.sticky-color-swatch[data-color="rose"]   { background: var(--sticky-rose-bg);   border: 2px solid var(--sticky-rose-border); }
+
+/* ============================================================
+   Home Dashboard — Sticky Notes Desk Preview Hub
+   ============================================================ */
+
+/* Bento band. align-items:start stops the sparse nav card from stretching to
+   the height of the preview card (which left ~340px of dead space at 1280px). */
+.home-bento-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+
+@media (min-width: 1280px) {
+  /* sidebar 216 + rail 344 + padding 48 => 672px of content at 1280px.
+     A 0.8/1.2 split gives the preview hub enough room for 2 columns;
+     auto-fill + minmax(140px) collapsed to a single 288px column here. */
+  .home-bento-row {
+    grid-template-columns: minmax(240px, 0.8fr) minmax(0, 1.2fr);
+  }
+}
+
+/* Workspace Navigation footer — restores the Core Principles that the
+   Sticky Desk card replaced, in the slot it left empty. */
+.home-principles {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+.home-principles__line strong {
+  color: var(--color-text-main);
+  font-weight: var(--font-weight-semibold);
+}
+.home-principles__kbd {
+  margin-top: 4px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+.home-principles__kbd:hover { color: var(--color-primary); text-decoration: underline; }
+.home-principles__kbd kbd { font-size: var(--font-size-2xs); }
+
+/* Sticky Desk card internals */
+.home-sticky-card__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: var(--space-2);
+}
+.home-sticky-card__sub {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+.home-sticky-card__chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: var(--space-2);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+.home-sticky-card__footer {
+  margin-top: var(--space-3);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+.home-sticky-card__more {
+  font-size: var(--font-size-xs);
+  color: var(--color-primary-text);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.home-sticky-card__more:hover { text-decoration: underline; }
+
+/* Metric chips — theme-aware, AA-compliant on both surface and -subtle. */
+.home-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-subtle);
+  color: var(--color-text-main);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.home-chip[data-tone="urgent"] { background: var(--color-danger-subtle);  color: var(--priority-urgent-text); }
+.home-chip[data-tone="high"]   { background: var(--color-warning-subtle); color: var(--priority-high-text); }
+.home-chip[data-tone="medium"] { background: var(--color-bg-subtle);      color: var(--priority-medium-text); }
+.home-chip[data-tone="low"]    { background: var(--color-success-subtle); color: var(--priority-low-text); }
+.home-chip[data-tone="quiet"]  { background: var(--color-bg-subtle);      color: var(--color-text-muted); }
+
+.home-sticky-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 10px;
+  margin-top: var(--space-1);
+}
+
+/* Mini preview tile. No !important: the old pair existed only to out-specify
+   inline styles, which have now moved here. */
+.home-sticky-mini {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
+  min-height: 104px;
+  padding: 10px 12px;
+  border: 1px solid var(--sticky-border);
+  border-radius: var(--radius-md);
+  background: var(--sticky-bg);
+  color: var(--sticky-text);
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+  opacity: 1;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+.home-sticky-mini:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  opacity: 1;
+}
+.home-sticky-mini:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.home-sticky-mini[data-color="yellow"] { --sticky-bg: var(--sticky-yellow-bg); --sticky-border: var(--sticky-yellow-border); --sticky-text: var(--sticky-yellow-text); --sticky-tape: var(--sticky-yellow-tape); }
+.home-sticky-mini[data-color="peach"]  { --sticky-bg: var(--sticky-peach-bg);  --sticky-border: var(--sticky-peach-border);  --sticky-text: var(--sticky-peach-text);  --sticky-tape: var(--sticky-peach-tape); }
+.home-sticky-mini[data-color="mint"]   { --sticky-bg: var(--sticky-mint-bg);   --sticky-border: var(--sticky-mint-border);   --sticky-text: var(--sticky-mint-text);   --sticky-tape: var(--sticky-mint-tape); }
+.home-sticky-mini[data-color="sky"]    { --sticky-bg: var(--sticky-sky-bg);    --sticky-border: var(--sticky-sky-border);    --sticky-text: var(--sticky-sky-text);    --sticky-tape: var(--sticky-sky-tape); }
+.home-sticky-mini[data-color="lilac"]  { --sticky-bg: var(--sticky-lilac-bg);  --sticky-border: var(--sticky-lilac-border);  --sticky-text: var(--sticky-lilac-text);  --sticky-tape: var(--sticky-lilac-tape); }
+.home-sticky-mini[data-color="rose"]   { --sticky-bg: var(--sticky-rose-bg);   --sticky-border: var(--sticky-rose-border);   --sticky-text: var(--sticky-rose-text);   --sticky-tape: var(--sticky-rose-tape); }
+
+.home-sticky-mini__tape {
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--sticky-tape);
+  pointer-events: none;
+}
+.home-sticky-mini__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: var(--font-size-xs);
+}
+.home-sticky-mini__expiry {
+  margin-left: auto;
+  font-weight: var(--font-weight-medium);
+  color: var(--sticky-text);
+  opacity: 0.85;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.home-sticky-mini__text {
+  flex: 1;
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+  font-weight: var(--font-weight-medium);
+  color: var(--sticky-text);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow-wrap: anywhere;
+}
+.home-sticky-mini__cta {
+  display: flex;
+  justify-content: flex-end;
+  font-size: var(--font-size-xs);
+  color: var(--sticky-text);
+  opacity: 0.7;
+}
+.home-sticky-mini:hover .home-sticky-mini__cta,
+.home-sticky-mini:focus-visible .home-sticky-mini__cta {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+/* Priority badge sits on a solid surface chip so its colour never has to
+   compete with the note tint underneath. */
+.home-sticky-mini__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-wide);
+  padding: 1px 7px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-surface);
+  box-shadow: var(--shadow-xs);
+  color: var(--priority-text, var(--color-text-muted));
+  white-space: nowrap;
+}
+.home-sticky-mini__badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--priority-dot, currentColor);
+  flex-shrink: 0;
+}
+.home-sticky-mini__badge[data-priority="urgent"] { --priority-text: var(--priority-urgent-text); --priority-dot: var(--priority-urgent-dot); }
+.home-sticky-mini__badge[data-priority="high"]   { --priority-text: var(--priority-high-text);   --priority-dot: var(--priority-high-dot); }
+.home-sticky-mini__badge[data-priority="medium"] { --priority-text: var(--priority-medium-text); --priority-dot: var(--priority-medium-dot); }
+.home-sticky-mini__badge[data-priority="low"]    { --priority-text: var(--priority-low-text);    --priority-dot: var(--priority-low-dot); }
+
+.home-sticky-empty {
+  padding: var(--space-4);
+  text-align: center;
+  background: var(--color-bg-subtle);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  margin-top: var(--space-1);
+}
+.home-sticky-empty__icon { font-size: 22px; margin-bottom: 4px; }
+.home-sticky-empty__title {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-main);
+  margin-bottom: 2px;
+}
+.home-sticky-empty__body { margin-bottom: 10px; }
+
+/* A user's OS motion preference must beat every component transition,
+   including inline styles written by the drag handler. This is the standard
+   accessibility reset — categorically different from the !important pair that
+   existed to win a specificity fight against an inline box-shadow. */
+@media (prefers-reduced-motion: reduce) {
+  .home-sticky-mini,
+  .sticky-note-card,
+  .sticky-color-swatch,
+  .btn-sticky-quick-delete {
+    transition: none !important;
+    animation: none !important;
+  }
+  .home-sticky-mini:hover,
+  .sticky-color-swatch:hover,
+  .sticky-color-swatch.active {
+    transform: none;
+  }
 }
 
 

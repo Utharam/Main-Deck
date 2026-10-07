@@ -98,6 +98,14 @@ async function init() {
 
     // 2. Register Service Worker for PWA
     if ('serviceWorker' in navigator) {
+      let reloading = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        // A new version took control. Reload once so the user is not left
+        // running stale JS against a fresh IndexedDB schema.
+        if (reloading) return;
+        reloading = true;
+        window.location.reload();
+      });
       navigator.serviceWorker.register('./sw.js').catch((err) => {
         console.warn('Service worker registration failed:', err);
       });
@@ -105,6 +113,17 @@ async function init() {
 
     // 3. Initialize DB and defaults
     await store.initializeDefaults();
+
+    // 3b. Purge expired sticky notes once, in a single transaction.
+    //     getStickies() is a pure read; this is the only place that deletes.
+    try {
+      const purgedStickies = await store.cleanupExpiredStickies();
+      if (purgedStickies > 0) {
+        console.info(`[stickies] purged ${purgedStickies} expired note(s)`);
+      }
+    } catch (err) {
+      console.warn('Sticky cleanup failed:', err);
+    }
 
     // 4. Load theme
     let theme = await store.getSetting('theme', 'pastel-green');
@@ -139,6 +158,10 @@ async function init() {
     // 11. Render Right Rail Widgets
     await renderAllWidgets();
 
+    // 11b. Keep rail widgets + sticky countdowns in sync with the store
+    setupDataChangeRefresh();
+    setupExpiryTicker();
+
     // 12. Mount Footer Stress Meter (Center)
     const footerStressEl = document.getElementById('footer-stress-meter');
     if (footerStressEl) {
@@ -171,9 +194,13 @@ async function init() {
 
 /**
  * Mobile / Small Screen Notice
+ *
+ * The layout requires min-width: 1024px (css/layout.css), so anything narrower
+ * than that gets a horizontally scrolling, clipped app. The old 850px threshold
+ * left a dead zone between 850 and 1024px with no warning at all.
  */
 function checkMobileNotice() {
-  const isSmallScreen = window.innerWidth < 850 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const isSmallScreen = window.innerWidth < 1024 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   const noticeEl = document.getElementById('mobile-screen-notice');
   const dismissBtn = document.getElementById('btn-dismiss-mobile-notice');
 
@@ -315,9 +342,16 @@ async function handleRoute() {
 }
 
 /**
- * Render all registered widgets in the right rail
+ * Render all registered widgets in the right rail.
+ *
+ * @param {object} [opts]
+ * @param {boolean} [opts.includeDocks=true] Also re-render the header weather and
+ *   footer stress docks. Pass false from the data-change refresh: the stress
+ *   slider persists on every arrow keypress, so re-rendering it would destroy
+ *   focus mid-adjustment, and rebuilding it during a pointer drag would swap the
+ *   element out from under the captured pointer.
  */
-export async function renderAllWidgets() {
+export async function renderAllWidgets({ includeDocks = true } = {}) {
   const widgetContainer = document.getElementById('app-widgets');
   if (!widgetContainer) return;
 
@@ -333,11 +367,78 @@ export async function renderAllWidgets() {
     }
   }
 
+  if (!includeDocks) return;
+
   const headerWeatherEl = document.getElementById('header-weather');
   if (headerWeatherEl) await weatherWidget.render(headerWeatherEl);
 
   const footerStressEl = document.getElementById('footer-stress-meter');
   if (footerStressEl) await stressWidget.render(footerStressEl);
+}
+
+/**
+ * Refresh every mounted widget when persisted data changes.
+ * Debounced because batch operations (drag, grid rearrange, import) emit many
+ * times in quick succession and each render is an async IndexedDB read.
+ * Without this the rail cards go stale on edit while the Home pills — which
+ * re-read on navigation — stay correct, and both are visible at once.
+ */
+function setupDataChangeRefresh() {
+  let pending = null;
+  document.addEventListener(store.DATA_CHANGED_EVENT, () => {
+    if (pending) clearTimeout(pending);
+    pending = setTimeout(() => {
+      pending = null;
+      renderAllWidgets({ includeDocks: false }).catch((e) => console.error('Widget refresh failed:', e));
+    }, 250);
+  });
+}
+
+/**
+ * Keep sticky expiry countdowns honest while the tab stays open.
+ * Updates only the text of existing nodes instead of re-rendering the page, and
+ * purges + refreshes once when a note's timer actually runs out.
+ */
+function setupExpiryTicker() {
+  const TICK_MS = 30000;
+
+  const tick = async () => {
+    const nodes = document.querySelectorAll('[data-sticky-expiry]');
+    if (nodes.length === 0) return;
+
+    const { formatStickyExpiry } = await import('./utils/sticky-shared.js');
+    let expiredCount = 0;
+
+    nodes.forEach((node) => {
+      const raw = node.getAttribute('data-sticky-expiry') || '';
+      const text = formatStickyExpiry(raw);
+      // Home renders "⏳ <text>"; the board renders bare "<text>".
+      const hasGlyph = node.textContent.trim().startsWith('⏳');
+      const next = hasGlyph ? `⏳ ${text}` : text;
+      if (node.textContent !== next) node.textContent = next;
+      if (text === 'Expired') expiredCount++;
+    });
+
+    if (expiredCount > 0) {
+      try {
+        await store.cleanupExpiredStickies();
+      } catch (e) {
+        console.warn('Sticky cleanup failed:', e);
+      }
+      // Re-route so an expired card disappears from the board too, not just
+      // from the store. Without this the record is deleted from IndexedDB while
+      // the card stays on screen reading "Expired" until the user navigates.
+      await handleRoute();
+      await renderAllWidgets({ includeDocks: false });
+    }
+  };
+
+  setInterval(() => { tick().catch(() => {}); }, TICK_MS);
+
+  // Coming back to a tab left open overnight must re-check timers.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') tick().catch(() => {});
+  });
 }
 
 /**
@@ -368,7 +469,7 @@ async function openGlobalSearch() {
     title: '🔍 Quick Search',
     contentHtml: `
       <div class="form-group">
-        <input type="text" id="search-input" placeholder="Type to search tasks, notes, stickies, SOPs, projects..." autofocus style="font-size: var(--font-size-md);" />
+        <input type="text" id="search-input" placeholder="Type to search tasks, notes, stickies, SOPs, projects..." style="font-size: var(--font-size-md);" />
       </div>
       <div id="search-results" style="display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-3); max-height: 350px; overflow-y: auto;">
         <div style="font-size: var(--font-size-xs); color: var(--color-text-muted);">Type anything to find items.</div>

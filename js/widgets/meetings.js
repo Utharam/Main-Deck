@@ -3,7 +3,7 @@
  */
 
 import * as store from '../store.js';
-import { escapeHtml, emptyStateHtml, showModal } from '../ui.js';
+import { escapeHtml, safeUrl, emptyStateHtml, showModal } from '../ui.js';
 import { icons } from '../icons.js';
 
 export const widget = {
@@ -135,7 +135,7 @@ async function openMeetingDetailModal(meeting, container, widgetInstance) {
       ${meeting.link ? `
         <div class="kv-row">
           <span class="kv-label">Join Link:</span>
-          <span class="kv-value"><a href="${escapeHtml(meeting.link)}" target="_blank" rel="noopener">🔗 Open Meeting Room ↗</a></span>
+          <span class="kv-value"><a href="${safeUrl(meeting.link)}" target="_blank" rel="noopener">🔗 Open Meeting Room ↗</a></span>
         </div>
       ` : ''}
 

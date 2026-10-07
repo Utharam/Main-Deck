@@ -5,6 +5,25 @@
 import * as db from './db.js';
 import { generateId } from './ui.js';
 
+const DATA_CHANGED_EVENT = 'maindeck:data-changed';
+
+/**
+ * Notify the app shell that persisted data changed, so views that are mounted
+ * outside the router (the right-rail widgets, the footer docks) can refresh.
+ * Without this the rail cards go stale on edit while the Home pills — which
+ * re-read on navigation — stay correct, and both are visible at once.
+ * @param {string} [source] Optional label for debugging
+ */
+export function emitDataChanged(source = 'store') {
+  try {
+    document.dispatchEvent(new CustomEvent(DATA_CHANGED_EVENT, { detail: { source } }));
+  } catch (err) {
+    console.warn('emitDataChanged failed:', err);
+  }
+}
+
+export { DATA_CHANGED_EVENT };
+
 // Curated 50+ Human Quotes & Encouragements
 const DEFAULT_MESSAGES = [
   // Work
@@ -82,6 +101,7 @@ export async function initializeDefaults() {
   if (!nameSetting) {
     for (const [k, v] of Object.entries(DEFAULT_SETTINGS)) {
       await db.put('settings', { key: k, value: v });
+      emitDataChanged('put');
     }
   }
 
@@ -89,13 +109,24 @@ export async function initializeDefaults() {
   if (msgCount < 20) {
     for (const msg of DEFAULT_MESSAGES) {
       await db.put('messages', msg);
+      emitDataChanged('put');
     }
   }
 
   const installMeta = await db.get('meta', 'installedAt');
   if (!installMeta) {
     await db.put('meta', { key: 'installedAt', newDate: new Date().toISOString(), value: new Date().toISOString() });
-    await db.put('meta', { key: 'lastBackupAt', value: new Date().toISOString() });
+    emitDataChanged('put');
+  }
+
+  // Earlier versions seeded lastBackupAt to the install timestamp, which made
+  // Settings report a successful backup that never happened and suppressed the
+  // real backup reminder for 3.5 days. Clear that bogus seed so existing users
+  // see "Never" until they genuinely export.
+  const lastBackup = await db.get('meta', 'lastBackupAt');
+  const installedAt = installMeta ? installMeta.value : null;
+  if (lastBackup && installedAt && lastBackup.value === installedAt) {
+    await db.remove('meta', 'lastBackupAt');
   }
 }
 
@@ -107,6 +138,7 @@ export async function getSetting(key, fallback = null) {
 }
 
 export async function setSetting(key, value) {
+  emitDataChanged('setSetting');
   return await db.put('settings', { key, value });
 }
 
@@ -154,11 +186,13 @@ export async function saveTask(task) {
   if (!task.createdAt) task.createdAt = new Date().toISOString();
   task.updatedAt = new Date().toISOString();
   await db.put('tasks', task);
+  emitDataChanged('put');
   return task;
 }
 
 export async function deleteTask(id) {
-  return await db.remove('tasks', id);
+  await db.remove('tasks', id);
+  emitDataChanged('remove');
 }
 
 /* ==================== PROJECTS ==================== */
@@ -176,6 +210,7 @@ export async function saveProject(project) {
   if (!project.createdAt) project.createdAt = new Date().toISOString();
   project.updatedAt = new Date().toISOString();
   await db.put('projects', project);
+  emitDataChanged('put');
   return project;
 }
 
@@ -188,10 +223,20 @@ export async function deleteProject(id) {
   for (const t of tasks) {
     await db.remove('tasks', t.id);
   }
-  return await db.remove('projects', id);
+  await db.remove('projects', id);
+  emitDataChanged('remove');
 }
 
 /* ==================== PHASES ==================== */
+
+/**
+ * Get every phase across all projects.
+ * Used by the Projects page for step completion toggles and context note autosave.
+ * @returns {Promise<any[]>}
+ */
+export async function getPhases() {
+  return await db.getAll('phases');
+}
 
 export async function getPhasesByProject(projectId) {
   return await db.getByIndex('phases', 'projectId', projectId);
@@ -200,11 +245,13 @@ export async function getPhasesByProject(projectId) {
 export async function savePhase(phase) {
   if (!phase.id) phase.id = generateId();
   await db.put('phases', phase);
+  emitDataChanged('put');
   return phase;
 }
 
 export async function deletePhase(id) {
-  return await db.remove('phases', id);
+  await db.remove('phases', id);
+  emitDataChanged('remove');
 }
 
 /* ==================== NOTES ==================== */
@@ -217,11 +264,13 @@ export async function saveNote(note) {
   if (!note.id) note.id = generateId();
   note.updatedAt = new Date().toISOString();
   await db.put('notes', note);
+  emitDataChanged('put');
   return note;
 }
 
 export async function deleteNote(id) {
-  return await db.remove('notes', id);
+  await db.remove('notes', id);
+  emitDataChanged('remove');
 }
 
 /* ==================== SOPS ==================== */
@@ -234,11 +283,13 @@ export async function saveSOP(sop) {
   if (!sop.id) sop.id = generateId();
   sop.updatedAt = new Date().toISOString();
   await db.put('sops', sop);
+  emitDataChanged('put');
   return sop;
 }
 
 export async function deleteSOP(id) {
-  return await db.remove('sops', id);
+  await db.remove('sops', id);
+  emitDataChanged('remove');
 }
 
 /* ==================== CALLS, EMAILS, MEETINGS, REMINDERS ==================== */
@@ -249,10 +300,12 @@ export async function getCalls() {
 export async function saveCall(item) {
   if (!item.id) item.id = generateId();
   await db.put('calls', item);
+  emitDataChanged('put');
   return item;
 }
 export async function deleteCall(id) {
-  return await db.remove('calls', id);
+  await db.remove('calls', id);
+  emitDataChanged('remove');
 }
 
 export async function getEmails() {
@@ -261,10 +314,12 @@ export async function getEmails() {
 export async function saveEmail(item) {
   if (!item.id) item.id = generateId();
   await db.put('emails', item);
+  emitDataChanged('put');
   return item;
 }
 export async function deleteEmail(id) {
-  return await db.remove('emails', id);
+  await db.remove('emails', id);
+  emitDataChanged('remove');
 }
 
 export async function getMeetings() {
@@ -273,10 +328,12 @@ export async function getMeetings() {
 export async function saveMeeting(item) {
   if (!item.id) item.id = generateId();
   await db.put('meetings', item);
+  emitDataChanged('put');
   return item;
 }
 export async function deleteMeeting(id) {
-  return await db.remove('meetings', id);
+  await db.remove('meetings', id);
+  emitDataChanged('remove');
 }
 
 export async function getReminders() {
@@ -285,10 +342,12 @@ export async function getReminders() {
 export async function saveReminder(item) {
   if (!item.id) item.id = generateId();
   await db.put('reminders', item);
+  emitDataChanged('put');
   return item;
 }
 export async function deleteReminder(id) {
-  return await db.remove('reminders', id);
+  await db.remove('reminders', id);
+  emitDataChanged('remove');
 }
 
 /* ==================== ACTIVITIES & MESSAGES ==================== */
@@ -299,10 +358,12 @@ export async function getActivities() {
 export async function saveActivity(item) {
   if (!item.id) item.id = generateId();
   await db.put('activities', item);
+  emitDataChanged('put');
   return item;
 }
 export async function deleteActivity(id) {
-  return await db.remove('activities', id);
+  await db.remove('activities', id);
+  emitDataChanged('remove');
 }
 
 export async function getMessages() {
@@ -311,40 +372,35 @@ export async function getMessages() {
 export async function saveMessage(item) {
   if (!item.id) item.id = generateId();
   await db.put('messages', item);
+  emitDataChanged('put');
   return item;
 }
 export async function deleteMessage(id) {
-  return await db.remove('messages', id);
+  await db.remove('messages', id);
+  emitDataChanged('remove');
 }
 
 /* ==================== STICKY NOTES ==================== */
 
 /**
- * Get all sticky notes, auto-purging any that have passed their disappearing timer.
+ * Get all live sticky notes. Expired notes are filtered out but NOT deleted —
+ * purging is the exclusive job of cleanupExpiredStickies(), never of a getter.
+ * Malformed `expiresAt` values are kept (Date.parse -> NaN fails the comparison).
  * @returns {Promise<any[]>}
  */
 export async function getStickies() {
-  const all = await db.getAll('stickies');
   const now = Date.now();
-  const valid = [];
-  const expiredIds = [];
+  const all = await db.getAll('stickies');
+  return all.filter((s) => !(s.expiresAt && Date.parse(s.expiresAt) <= now));
+}
 
-  for (const s of all) {
-    if (s.expiresAt && new Date(s.expiresAt).getTime() <= now) {
-      expiredIds.push(s.id);
-    } else {
-      valid.push(s);
-    }
-  }
-
-  // Cleanup expired stickies asynchronously in the background
-  if (expiredIds.length > 0) {
-    for (const id of expiredIds) {
-      db.remove('stickies', id).catch(() => {});
-    }
-  }
-
-  return valid;
+/**
+ * Get every stored sticky note, including expired ones.
+ * Used by backup export so a restore is faithful to what was stored.
+ * @returns {Promise<any[]>}
+ */
+export async function getStickiesRaw() {
+  return await db.getAll('stickies');
 }
 
 /**
@@ -374,6 +430,7 @@ export async function saveSticky(sticky) {
   if (!sticky.color) sticky.color = 'yellow';
 
   await db.put('stickies', sticky);
+  emitDataChanged('put');
   return sticky;
 }
 
@@ -382,7 +439,8 @@ export async function saveSticky(sticky) {
  * @param {string} id
  */
 export async function deleteSticky(id) {
-  return await db.remove('stickies', id);
+  await db.remove('stickies', id);
+  emitDataChanged('remove');
 }
 
 /**
@@ -396,23 +454,34 @@ export async function batchSaveStickies(stickies) {
       store.put(item);
     }
   });
+  emitDataChanged('batchSaveStickies');
 }
 
 /**
- * Sweep and purge expired stickies explicitly.
+ * Sweep and permanently purge expired stickies in a single transaction.
+ * Read and delete must share one transaction: awaiting a second transaction
+ * inside the callback would let the first auto-commit (TransactionInactiveError).
  * @returns {Promise<number>} Number of purged stickies
  */
 export async function cleanupExpiredStickies() {
-  const all = await db.getAll('stickies');
   const now = Date.now();
-  let count = 0;
-  for (const s of all) {
-    if (s.expiresAt && new Date(s.expiresAt).getTime() <= now) {
-      await db.remove('stickies', s.id);
-      count++;
-    }
-  }
-  return count;
+  return await db.withStore('stickies', 'readwrite', (store) => {
+    return new Promise((resolve, reject) => {
+      const getReq = store.getAll();
+      getReq.onsuccess = () => {
+        const rows = getReq.result || [];
+        const ids = rows
+          .filter((s) => s.expiresAt && Date.parse(s.expiresAt) <= now)
+          .map((s) => s.id);
+        // Issue every delete synchronously so they share this transaction.
+        ids.forEach((id) => store.delete(id));
+        // withStore() resolves on tx.oncomplete, so the caller only ever
+        // observes this count once the deletes have actually committed.
+        resolve(ids.length);
+      };
+      getReq.onerror = () => reject(getReq.error);
+    });
+  });
 }
 
 

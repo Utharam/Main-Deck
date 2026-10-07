@@ -3,16 +3,25 @@
  */
 
 import * as store from '../store.js';
-import { escapeHtml, showModal } from '../ui.js';
+import { escapeHtml, safeUrl, showModal } from '../ui.js';
 import { isWithinWorkingHours } from '../utils/time.js';
 import { icons } from '../icons.js';
+import {
+  formatStickyExpiry,
+  countExpiringSoon,
+  sortStickiesForDisplay,
+  stickyColorId,
+  stickyPriorityDef
+} from '../utils/sticky-shared.js';
 
 const DEFAULT_QUICK_LINKS = [
-  { id: 'ql-1', name: 'Google Sheets', url: 'https://sheets.google.com', icon: '📊' },
+  { id: 'ql-1', name: 'Google Sheets', url: '#', icon: '📊' },
   { id: 'ql-2', name: 'Company Portal', url: '#', icon: '🏢' },
   { id: 'ql-3', name: 'Banking / Invoices', url: '#', icon: '💳' },
   { id: 'ql-4', name: 'Accounting System', url: '#', icon: '📑' }
 ];
+
+const PREVIEW_LIMIT = 4;
 
 export async function render(container) {
   const settings = await store.getAllSettings();
@@ -28,6 +37,7 @@ export async function render(container) {
   const meetings = await store.getMeetings();
   const reminders = await store.getReminders();
   const activities = await store.getActivities();
+  const stickies = await store.getStickies();
 
   const pendingTasks = tasks.filter(t => t.status !== 'completed').length;
   const pendingCalls = calls.filter(c => c.status !== 'done').length;
@@ -35,6 +45,17 @@ export async function render(container) {
   const pendingMeetings = meetings.filter(m => m.status !== 'done').length;
   const pendingReminders = reminders.filter(r => r.status !== 'done').length;
   const totalActivities = activities.length;
+
+  const totalStickies = stickies.length;
+  const urgentStickies = stickies.filter(s => s.priority === 'urgent').length;
+  const highStickies = stickies.filter(s => s.priority === 'high').length;
+  const mediumStickies = stickies.filter(s => s.priority === 'medium').length;
+  const lowStickies = stickies.filter(s => s.priority === 'low').length;
+  const expiringSoon = countExpiringSoon(stickies);
+  const standardOnly = totalStickies > 0 &&
+    urgentStickies === 0 && highStickies === 0 && mediumStickies === 0 && lowStickies === 0;
+
+  const previewStickies = sortStickiesForDisplay(stickies).slice(0, PREVIEW_LIMIT);
 
   let links = await store.getSetting('quickLinks', null);
   if (!links) {
@@ -129,7 +150,7 @@ export async function render(container) {
       </div>
 
       <!-- 3. Quick Pending Attention Rail Pill Bar -->
-      <div class="pending-pills-bar">
+      <div class="pending-pills-bar" role="group" aria-label="Pending attention">
         <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-text-subtle); margin-right: 6px; display: flex; align-items: center; gap: 4px;">
           <span>Attention:</span>
         </div>
@@ -169,22 +190,28 @@ export async function render(container) {
           <span>Days Since</span>
           <span class="pending-pill-count ${totalActivities > 0 ? 'has-items' : 'zero-items'}">${totalActivities}</span>
         </button>
+
+        <a href="#stickies" class="pending-pill" aria-label="Open Sticky Notes Desk" style="text-decoration: none;">
+          <span style="display: inline-flex; align-items: center;">${icons.pin}</span>
+          <span>Stickies</span>
+          <span class="pending-pill-count ${totalStickies > 0 ? 'has-items' : 'zero-items'}">${totalStickies}</span>
+        </a>
       </div>
 
-      <!-- 4. Bento Middle Row: Navigation & Core Principles -->
-      <div class="form-row">
+      <!-- 4. Bento Middle Row: Navigation & Sticky Notes Preview Hub -->
+      <div class="home-bento-row">
         <!-- Core Work Navigation Bento -->
         <div class="card">
           <div class="card-header">
             <h3 class="card-title" style="display: flex; align-items: center; gap: 8px;">
-              <span class="squircle-icon squircle-sky" style="width: 28px; height: 28px; font-size: 14px; border-radius: 8px;">🧭</span>
+              <span class="squircle-icon squircle-sky squircle-icon--sm">🧭</span>
               <span>Workspace Navigation</span>
             </h3>
           </div>
           <div style="display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: 4px;">
             <a href="#projects" class="btn btn-secondary btn-sm" style="gap: 8px;">
               <span style="display: inline-flex;">${icons.tasks}</span>
-              <span>Projects & Milestones</span>
+              <span>Projects &amp; Milestones</span>
             </a>
             <a href="#sop" class="btn btn-secondary btn-sm" style="gap: 8px;">
               <span style="display: inline-flex;">${icons.sop}</span>
@@ -195,7 +222,7 @@ export async function render(container) {
               <span>Notes</span>
             </a>
             <a href="#stickies" class="btn btn-secondary btn-sm" style="gap: 8px;">
-              <span style="display: inline-flex;">${icons.pin || '📌'}</span>
+              <span style="display: inline-flex;">${icons.pin}</span>
               <span>Sticky Notes</span>
             </a>
             <a href="#stressbuster" class="btn btn-secondary btn-sm" style="gap: 8px;">
@@ -203,21 +230,103 @@ export async function render(container) {
               <span>2-Minute Reset</span>
             </a>
           </div>
+
+          <!-- Core Principles: the app's thesis, restored here. It was the only
+               always-visible answer to "what is this for?", and it gives the
+               unnamed Stress Meter and 2-Minute Reset their meaning. -->
+          <div class="home-principles">
+            <div class="home-principles__line"><strong>1. Work</strong> deserves focus.</div>
+            <div class="home-principles__line"><strong>2. Rest</strong> deserves permission.</div>
+            <div class="home-principles__line"><strong>3. Life</strong> deserves the remaining time.</div>
+            <button type="button" id="btn-home-search-hint" class="home-principles__kbd">
+              <kbd>Ctrl</kbd> + <kbd>K</kbd> to search everything
+            </button>
+          </div>
         </div>
 
-        <!-- Philosophy Bento Card -->
+        <!-- Sticky Notes Desk Preview & Status Hub -->
         <div class="card">
-          <div class="card-header">
-            <h3 class="card-title" style="display: flex; align-items: center; gap: 8px;">
-              <span class="squircle-icon squircle-mint" style="width: 28px; height: 28px; font-size: 14px; border-radius: 8px;">🌱</span>
-              <span>Core Principles</span>
-            </h3>
+          <div class="card-header home-sticky-card__actions">
+            <div>
+              <h3 class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                <span class="squircle-icon squircle-lemon squircle-icon--sm">📌</span>
+                <span>Sticky Notes Desk</span>
+              </h3>
+              <div class="home-sticky-card__sub">
+                Active thoughts, scratchpads &amp; disappearing notes.
+              </div>
+            </div>
+            <a href="#stickies" class="btn btn-xs btn-primary">
+              <span>Open Board</span>
+              <span aria-hidden="true">→</span>
+            </a>
           </div>
-          <div style="font-size: var(--font-size-sm); color: var(--color-text-muted); line-height: 1.7; display: flex; flex-direction: column; gap: 4px;">
-            <div><strong style="color: var(--color-text-main);">1. Work</strong> deserves focus.</div>
-            <div><strong style="color: var(--color-text-main);">2. Rest</strong> deserves permission.</div>
-            <div><strong style="color: var(--color-text-main);">3. Life</strong> deserves the remaining time.</div>
-          </div>
+
+          <!-- Priority & Status Metric Chips. Hidden entirely at 0 notes:
+               a "0 Notes" chip stacked above "your desk is empty" was two
+               contradictory statements of the same fact. -->
+          ${totalStickies > 0 ? `
+            <div class="home-sticky-card__chips">
+              <span class="home-chip" data-tone="quiet">📌 ${totalStickies} ${totalStickies === 1 ? 'Note' : 'Notes'}</span>
+              ${urgentStickies > 0 ? `<span class="home-chip" data-tone="urgent">🔥 ${urgentStickies} Urgent</span>` : ''}
+              ${highStickies > 0 ? `<span class="home-chip" data-tone="high">⚡ ${highStickies} High Priority</span>` : ''}
+              ${mediumStickies > 0 ? `<span class="home-chip" data-tone="medium">● ${mediumStickies} Med</span>` : ''}
+              ${lowStickies > 0 ? `<span class="home-chip" data-tone="low">● ${lowStickies} Low</span>` : ''}
+              ${expiringSoon > 0 ? `<span class="home-chip" data-tone="high" title="Due within the next 24 hours">⏳ ${expiringSoon} Expiring soon</span>` : ''}
+              ${standardOnly ? `<span class="home-chip" data-tone="quiet">All Standard</span>` : ''}
+            </div>
+          ` : ''}
+
+          <!-- Items Preview Grid or Empty Prompt -->
+          ${totalStickies === 0 ? `
+            <div class="home-sticky-empty">
+              <div class="home-sticky-empty__icon" aria-hidden="true">📌</div>
+              <div class="home-sticky-empty__title">Your desk is empty</div>
+              <div class="home-sticky-empty__body">
+                Nothing captured yet. Throw quick thoughts, phone numbers, or scratchpads —
+                each note can carry a disappearing timer.
+              </div>
+              <a href="#stickies?new=1" class="btn btn-xs btn-secondary">+ Throw First Sticky</a>
+            </div>
+          ` : `
+            <div class="home-sticky-preview-grid">
+              ${previewStickies.map(s => {
+                const colorId = stickyColorId(s);
+                const pDef = stickyPriorityDef(s);
+                const expiryText = formatStickyExpiry(s.expiresAt);
+                const label = `${s.text.slice(0, 80)}${s.text.length > 80 ? '…' : ''} — ${pDef.label || 'No priority'}, ${expiryText}`;
+                return `
+                  <a
+                    href="#stickies?id=${encodeURIComponent(s.id)}"
+                    class="home-sticky-mini"
+                    data-color="${colorId}"
+                    title="${escapeHtml(label)}"
+                    aria-label="Open sticky note: ${escapeHtml(label)}"
+                  >
+                    <span class="home-sticky-mini__tape" aria-hidden="true"></span>
+                    <span class="home-sticky-mini__head">
+                      ${pDef.badge ? `
+                        <span class="home-sticky-mini__badge" data-priority="${pDef.id}">
+                          <span class="home-sticky-mini__badge-dot" aria-hidden="true"></span>${pDef.badge}
+                        </span>` : ''}
+                      <span class="home-sticky-mini__expiry" data-sticky-expiry="${escapeHtml(s.expiresAt || '')}">⏳ ${escapeHtml(expiryText)}</span>
+                    </span>
+                    <span class="home-sticky-mini__text">${escapeHtml(s.text)}</span>
+                    <span class="home-sticky-mini__cta" aria-hidden="true">Open →</span>
+                  </a>
+                `;
+              }).join('')}
+            </div>
+          `}
+
+          ${totalStickies > PREVIEW_LIMIT ? `
+            <div class="home-sticky-card__footer">
+              <span>Showing ${previewStickies.length} of ${totalStickies}</span>
+              <a href="#stickies" class="home-sticky-card__more">
+                View ${totalStickies - PREVIEW_LIMIT} more on board →
+              </a>
+            </div>
+          ` : ''}
         </div>
       </div>
 
@@ -226,7 +335,7 @@ export async function render(container) {
         <div class="card-header">
           <div>
             <h3 class="card-title" style="display: flex; align-items: center; gap: 8px;">
-              <span class="squircle-icon squircle-amber" style="width: 28px; height: 28px; font-size: 14px; border-radius: 8px;">⚡</span>
+              <span class="squircle-icon squircle-amber squircle-icon--sm">⚡</span>
               <span>Quick Launch Links</span>
             </h3>
             <div style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: 4px;">
@@ -239,7 +348,7 @@ export async function render(container) {
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-3); margin-top: var(--space-2);">
           ${links.map(l => `
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background-color: var(--color-bg-subtle); border-radius: var(--radius-lg); border: 1px solid var(--color-border); transition: all var(--transition-fast);">
-              <a href="${escapeHtml(l.url)}" target="_blank" rel="noopener" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--color-text-main); font-weight: 500; font-size: var(--font-size-sm); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
+              <a href="${safeUrl(l.url)}" target="_blank" rel="noopener" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--color-text-main); font-weight: 500; font-size: var(--font-size-sm); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
                 <span style="font-size: 16px;">${escapeHtml(l.icon || '🔗')}</span>
                 <span style="overflow: hidden; text-overflow: ellipsis;">${escapeHtml(l.name)}</span>
               </a>
@@ -305,8 +414,19 @@ export async function render(container) {
     });
   });
 
+  // Attach Event: Workspace Navigation footer keyboard hint opens global search
+  const searchHintBtn = container.querySelector('#btn-home-search-hint');
+  if (searchHintBtn) {
+    searchHintBtn.addEventListener('click', () => {
+      const headerSearch = document.getElementById('header-search-btn');
+      if (headerSearch) headerSearch.click();
+    });
+  }
+
   // Attach Event: Click Pending Pill to Scroll & Highlight Right Rail Widget
-  container.querySelectorAll('.pending-pill').forEach((pill) => {
+  // Scoped to buttons carrying data-widget — the Stickies pill is an <a href>
+  // and has no widget slot to jump to.
+  container.querySelectorAll('button.pending-pill[data-widget]').forEach((pill) => {
     pill.addEventListener('click', () => {
       const widgetName = pill.getAttribute('data-widget');
       const targetEl = document.getElementById(`widget-slot-${widgetName}`);

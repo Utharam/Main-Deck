@@ -28,7 +28,7 @@ export async function exportFullBackup() {
   const reminders = await store.getReminders();
   const activities = await store.getActivities();
   const messages = await store.getMessages();
-  const stickies = await store.getStickies();
+  const stickies = await store.getStickiesRaw();
 
   const backupPayload = {
     format: 'workbench',

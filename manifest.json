@@ -1,6 +1,7 @@
 {
   "name": "Main Deck — Personal Control Surface",
   "short_name": "Main Deck",
+  "version": "4.3.0",
   "description": "Local-first personal control surface by Utharam. Projects, tasks, notes, SOPs, and daily wellness — all in your browser.",
   "start_url": "./index.html",
   "scope": "./",

@@ -19,6 +19,45 @@ export function escapeHtml(str) {
 }
 
 /**
+ * Allowed URL schemes for user-supplied links (quick links, meeting links).
+ */
+const SAFE_URL_SCHEMES = new Set(['http:', 'https:', 'mailto:', 'tel:']);
+
+/**
+ * Sanitize a user-supplied URL for use in an href attribute.
+ * Allowlists the scheme; anything else collapses to `fallback`.
+ * Parses with `new URL()` rather than regexing the raw string because the URL
+ * parser strips tabs/newlines, so obfuscated "java\tscript:" is caught too.
+ * escapeHtml() alone is NOT sufficient: it never validates the scheme.
+ * @param {string} value
+ * @param {string} [fallback='#']
+ * @returns {string} Escaped, safe URL ready for interpolation into href="..."
+ */
+export function safeUrl(value, fallback = '#') {
+  if (value === null || value === undefined) return fallback;
+  const raw = String(value).trim();
+  if (raw === '') return fallback;
+
+  // In-app anchors and relative paths carry no scheme to validate.
+  if (raw.startsWith('#') || raw.startsWith('/') ||
+      raw.startsWith('./') || raw.startsWith('../')) {
+    return escapeHtml(raw);
+  }
+
+  let parsed;
+  try {
+    parsed = new URL(raw, document.baseURI);
+  } catch (err) {
+    return fallback;
+  }
+  if (!SAFE_URL_SCHEMES.has(parsed.protocol)) return fallback;
+
+  // Return the ORIGINAL string (not parsed.href) so nothing is silently
+  // rewritten; escapeHtml neutralises quotes so the attribute cannot break out.
+  return escapeHtml(raw);
+}
+
+/**
  * Generate a UUID v4
  * @returns {string}
  */

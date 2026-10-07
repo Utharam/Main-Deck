@@ -7,67 +7,21 @@ import * as store from '../store.js';
 import { escapeHtml, showModal } from '../ui.js';
 import { icons } from '../icons.js';
 import { formatRelativeTime } from '../utils/time.js';
-
-// Color themes for sticky notes (Cozy Pastel Bento Palette)
-const STICKY_COLORS = {
-  yellow: { id: 'yellow', name: 'Lemon', bg: '#fef9c3', border: '#fef08a', text: '#713f12', tape: 'rgba(234, 179, 8, 0.25)' },
-  peach:  { id: 'peach',  name: 'Peach', bg: '#fdeee3', border: '#fad5bf', text: '#7c2d12', tape: 'rgba(249, 115, 22, 0.25)' },
-  mint:   { id: 'mint',   name: 'Mint',  bg: '#e7f7ed', border: '#c4ebd1', text: '#14532d', tape: 'rgba(34, 197, 94, 0.25)' },
-  sky:    { id: 'sky',    name: 'Sky',   bg: '#e7f4fe', border: '#c7e5fc', text: '#0c4a6e', tape: 'rgba(14, 165, 233, 0.25)' },
-  lilac:  { id: 'lilac',  name: 'Lilac', bg: '#eee9fc', border: '#ded4fa', text: '#4c1d95', tape: 'rgba(168, 85, 247, 0.25)' },
-  rose:   { id: 'rose',   name: 'Rose',  bg: '#fce7f3', border: '#fbcfe8', text: '#831843', tape: 'rgba(236, 72, 153, 0.25)' }
-};
-
-// Priority definitions
-const PRIORITIES = {
-  none:   { id: 'none',   label: 'None',   badge: '',          dot: '' },
-  low:    { id: 'low',    label: 'Low',    badge: 'Low',       dot: '#10b981' },
-  medium: { id: 'medium', label: 'Medium', badge: 'Medium',    dot: '#f59e0b' },
-  high:   { id: 'high',   label: 'High',   badge: 'High',      dot: '#f97316' },
-  urgent: { id: 'urgent', label: 'Urgent', badge: 'Urgent 🔥', dot: '#ef4444' }
-};
-
-// Expiry options: 0 = Off (Never), 1..7 days
-const EXPIRY_OPTIONS = [
-  { days: 0, label: 'Off (Never)' },
-  { days: 1, label: '1 Day' },
-  { days: 2, label: '2 Days' },
-  { days: 3, label: '3 Days' },
-  { days: 4, label: '4 Days' },
-  { days: 5, label: '5 Days' },
-  { days: 6, label: '6 Days' },
-  { days: 7, label: '7 Days' }
-];
+import {
+  STICKY_COLOR_IDS,
+  STICKY_COLOR_NAMES,
+  STICKY_PRIORITIES,
+  STICKY_EXPIRY_OPTIONS,
+  formatStickyExpiry,
+  stickyColorId,
+  stickyPriorityDef
+} from '../utils/sticky-shared.js';
 
 let highestZIndex = 10;
 let currentViewMode = 'canvas'; // 'canvas' | 'grid'
 let selectedColor = 'yellow';
 let selectedPriority = 'none';
 let currentExpiryDays = 3; // Default 3 days disappearing timer
-
-/**
- * Format remaining time until expiration
- * @param {string|null} expiresAt ISO date
- * @returns {string} Human badge text
- */
-function getRemainingTimeText(expiresAt) {
-  if (!expiresAt) return '∞ Never expires';
-  const diffMs = new Date(expiresAt).getTime() - Date.now();
-  if (diffMs <= 0) return '⏳ Expiring now';
-  
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffDays = Math.floor(diffHours / 24);
-  const remHours = diffHours % 24;
-
-  if (diffDays >= 1) {
-    return remHours > 0 ? `⏳ ${diffDays}d ${remHours}h left` : `⏳ ${diffDays}d left`;
-  }
-  if (diffHours >= 1) {
-    return `⏳ ${diffHours}h left`;
-  }
-  const diffMins = Math.max(1, Math.floor(diffMs / (1000 * 60)));
-  return `⏳ ${diffMins}m left`;
-}
 
 /**
  * Render Sticky Notes Board
@@ -79,6 +33,18 @@ export async function render(container) {
   currentExpiryDays = Number(savedDefaultTimer);
 
   const stickies = await store.getStickies();
+
+  // "Desk is clear!" (notes existed and expired) vs "Nothing here yet"
+  // (never used). The empty board must not congratulate a first-time user.
+  const storedCount = await store.getStickiesRaw().then(all => all.length);
+  const hasAnyStoredSticky = storedCount > 0;
+
+  // Deep-link support: #stickies?id=<noteId> scrolls to one note,
+  // #stickies?new=1 focuses the composer.
+  const hashQuery = window.location.hash.split('?')[1] || '';
+  const routeParams = new URLSearchParams(hashQuery);
+  const focusStickyId = routeParams.get('id');
+  const focusComposer = routeParams.get('new') === '1';
   
   // Calculate max z-index to stack properly
   if (stickies.length > 0) {
@@ -92,8 +58,8 @@ export async function render(container) {
         <div class="card-header" style="flex-wrap: wrap; gap: var(--space-3); padding-bottom: 0; border-bottom: none;">
           <div>
             <div style="display: flex; align-items: center; gap: 8px;">
-              <span class="squircle-icon" style="background: var(--pastel-lemon-bg, #fef9c3); border-color: var(--pastel-lemon-border, #fef08a); color: #854d0e;">
-                ${icons.pin || '📌'}
+              <span class="squircle-icon squircle-lemon squircle-icon--sm">
+                ${icons.pin}
               </span>
               <div>
                 <h2 class="card-title" style="margin: 0;">Sticky Notes Board</h2>
@@ -110,9 +76,11 @@ export async function render(container) {
               ${stickies.length} ${stickies.length === 1 ? 'note' : 'notes'}
             </div>
 
-            <!-- Rearrange to Grid Button -->
+            <!-- Rearrange to Grid Button. Hidden at 0 notes: it early-returns, so it was
+                 a dead control on a first-time user's screen. -->
+            ${stickies.length > 0 ? `
             <button id="btn-rearrange-grid" class="btn btn-sm btn-secondary" title="Neatly snap and arrange all notes into an organized grid">
-              ${icons.grid || '📐'} <span>Rearrange to Grid</span>
+              ${icons.grid} <span>Rearrange to Grid</span>
             </button>
 
             <!-- Mode Switcher: Canvas vs Grid -->
@@ -124,12 +92,13 @@ export async function render(container) {
                 📐 Grid
               </button>
             </div>
+            ` : ''}
 
             <!-- Default Timer Setting -->
             <div class="sticky-timer-config" style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-text-muted); margin-left: 4px;">
               <span title="Default lifetime assigned to newly created sticky notes">Default Timer:</span>
               <select id="select-default-timer" class="form-input form-input-sm" style="width: auto; padding: 3px 8px; font-size: 11px; height: 28px; border-radius: 9999px;">
-                ${EXPIRY_OPTIONS.map(opt => `
+                ${STICKY_EXPIRY_OPTIONS.map(opt => `
                   <option value="${opt.days}" ${opt.days === currentExpiryDays ? 'selected' : ''}>
                     ${opt.label}
                   </option>
@@ -161,13 +130,13 @@ export async function render(container) {
               <div style="display: flex; align-items: center; gap: 6px;">
                 <span style="font-weight: 600; color: var(--color-text-muted);">Color:</span>
                 <div class="sticky-color-picker" style="display: flex; gap: 6px;">
-                  ${Object.values(STICKY_COLORS).map(c => `
+                  ${STICKY_COLOR_IDS.map(id => `
                     <button 
                       type="button" 
-                      class="sticky-color-swatch ${c.id === selectedColor ? 'active' : ''}" 
-                      data-color="${c.id}"
-                      title="${c.name}"
-                      style="width: 20px; height: 20px; border-radius: 50%; background: ${c.bg}; border: 2px solid ${c.border}; cursor: pointer; transition: transform 0.15s ease;"
+                      class="sticky-color-swatch ${id === selectedColor ? 'active' : ''}" 
+                      data-color="${id}"
+                      title="${STICKY_COLOR_NAMES[id]}"
+                      style="width: 20px; height: 20px; border-radius: 50%; cursor: pointer; transition: transform 0.15s ease;"
                     ></button>
                   `).join('')}
                 </div>
@@ -177,7 +146,7 @@ export async function render(container) {
               <div style="display: flex; align-items: center; gap: 6px;">
                 <span style="font-weight: 600; color: var(--color-text-muted);">Priority:</span>
                 <div class="sticky-priority-pills" style="display: flex; gap: 4px;">
-                  ${Object.values(PRIORITIES).map(p => `
+${Object.values(STICKY_PRIORITIES).map(p => `
                     <button 
                       type="button" 
                       class="sticky-priority-btn ${p.id === selectedPriority ? 'active' : ''}"
@@ -193,14 +162,15 @@ export async function render(container) {
 
               <!-- Disappearing Timer for this note -->
               <div style="display: flex; align-items: center; gap: 6px;">
-                <span style="font-weight: 600; color: var(--color-text-muted);">${icons.clock || '⏳'} Timer:</span>
+                <span style="font-weight: 600; color: var(--color-text-muted);">${icons.clock} Timer:</span>
                 <select id="select-note-timer" class="form-input form-input-sm" style="width: auto; padding: 2px 8px; font-size: 11px; height: 26px; border-radius: 9999px;">
-                  ${EXPIRY_OPTIONS.map(opt => `
+                  ${STICKY_EXPIRY_OPTIONS.map(opt => `
                     <option value="${opt.days}" ${opt.days === currentExpiryDays ? 'selected' : ''}>
                       ${opt.label}
                     </option>
                   `).join('')}
                 </select>
+                <span style="opacity: 0.85;" title="When a note's timer runs out it is permanently deleted. There is no recycle bin.">deleted at expiry</span>
               </div>
             </div>
           </div>
@@ -216,7 +186,7 @@ export async function render(container) {
         ${stickies.length === 0 ? `
           <div class="sticky-empty-state" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: var(--color-text-muted);">
             <div style="font-size: 42px; margin-bottom: 10px;">📌</div>
-            <div style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">Desk is completely clear!</div>
+            <div style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">${stickies.length === 0 && hasAnyStoredSticky ? 'Desk is clear!' : 'Nothing here yet'}</div>
             <div style="font-size: 13px; max-width: 320px; opacity: 0.8; margin: 0 auto;">
               Throw quick notes, thoughts, or reminders above. Drag them around freely or let them auto-expire.
             </div>
@@ -233,6 +203,27 @@ export async function render(container) {
 
   // Attach all interactive event handlers
   attachStickyEventListeners(container, stickies);
+
+  // Honour the deep link, then consume the query so re-renders (delete, drag
+  // save) don't re-trigger the scroll. replaceState does not fire hashchange,
+  // so there is no re-route loop.
+  if (focusStickyId) {
+    const card = container.querySelector(`#sticky-${CSS.escape(focusStickyId)}`);
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.classList.add('widget-slot-glow');
+      setTimeout(() => card.classList.remove('widget-slot-glow'), 1400);
+    }
+  } else if (focusComposer) {
+    const composer = container.querySelector('#sticky-input-text');
+    if (composer) {
+      composer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      composer.focus();
+    }
+  }
+  if (focusStickyId || focusComposer) {
+    history.replaceState(null, '', '#stickies');
+  }
 }
 
 /**
@@ -242,9 +233,9 @@ export async function render(container) {
  * @returns {string} HTML markup
  */
 function renderStickyCardHtml(s, index) {
-  const colorDef = STICKY_COLORS[s.color] || STICKY_COLORS.yellow;
-  const priorityDef = PRIORITIES[s.priority] || PRIORITIES.none;
-  const timeText = getRemainingTimeText(s.expiresAt);
+  const colorId = stickyColorId(s);
+  const priorityDef = stickyPriorityDef(s);
+  const timeText = formatStickyExpiry(s.expiresAt);
 
   // Position calculation for canvas mode
   let posX = s.x;
@@ -266,25 +257,26 @@ function renderStickyCardHtml(s, index) {
       class="sticky-note-card ${s.priority !== 'none' ? 'has-priority' : ''}" 
       id="sticky-${escapeHtml(s.id)}"
       data-id="${escapeHtml(s.id)}"
+      data-color="${colorId}"
       data-x="${posX}"
       data-y="${posY}"
       data-z="${zIdx}"
       data-rot="${rot}"
-      style="${styleAttr} width: 220px; min-height: 160px; background: ${colorDef.bg}; border: 1px solid ${colorDef.border}; border-radius: 14px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08), 0 4px 8px -2px rgba(0,0,0,0.04); display: flex; flex-direction: column; justify-content: space-between; padding: 12px 14px; cursor: grab; user-select: none; transition: box-shadow 0.2s ease, transform 0.2s ease;"
+      style="${styleAttr}"
     >
       <!-- Subtle Scotch Tape Decoration on top -->
-      <div class="sticky-tape" style="position: absolute; top: -8px; left: 50%; transform: translateX(-50%); width: 44px; height: 16px; background: ${colorDef.tape}; border-radius: 2px; backdrop-filter: blur(1px); opacity: 0.85; pointer-events: none;"></div>
+      <div class="sticky-tape"></div>
 
       <!-- Card Header: Priority, Timer, and Quick Delete (✕) -->
-      <div class="sticky-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+      <div class="sticky-card-header">
         <div style="display: flex; align-items: center; gap: 4px; overflow: hidden;">
           ${priorityDef.badge ? `
-            <span class="sticky-priority-tag" style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 2px 6px; border-radius: 9999px; background: rgba(0,0,0,0.06); color: ${priorityDef.dot}; display: inline-flex; align-items: center; gap: 3px;">
-              <span style="display:inline-block; width:5px; height:5px; border-radius:50%; background:${priorityDef.dot};"></span>
+            <span class="sticky-priority-tag" data-priority="${priorityDef.id}">
+              <span class="sticky-priority-tag__dot"></span>
               ${priorityDef.badge}
             </span>
           ` : ''}
-          <span class="sticky-timer-tag" style="font-size: 10px; color: ${colorDef.text}; opacity: 0.75; font-weight: 500;" title="${s.expiresAt ? `Expires: ${new Date(s.expiresAt).toLocaleString()}` : 'Never expires'}">
+          <span class="sticky-timer-tag" data-sticky-expiry="${escapeHtml(s.expiresAt || '')}" title="${s.expiresAt ? `Expires: ${new Date(s.expiresAt).toLocaleString()}` : 'Never expires'}">
             ${timeText}
           </span>
         </div>
@@ -294,7 +286,7 @@ function renderStickyCardHtml(s, index) {
           class="btn-sticky-quick-delete" 
           data-id="${escapeHtml(s.id)}" 
           title="Quick delete note"
-          style="background: transparent; border: none; cursor: pointer; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: ${colorDef.text}; opacity: 0.6; transition: opacity 0.15s, background 0.15s; font-size: 14px; font-weight: bold; padding: 0; line-height: 1;"
+          aria-label="Quick delete note"
         >
           ✕
         </button>
@@ -303,14 +295,13 @@ function renderStickyCardHtml(s, index) {
       <!-- Card Body: Note Text with Click-to-Edit -->
       <div 
         class="sticky-card-body" 
-        style="flex: 1; font-size: 13px; line-height: 1.45; color: ${colorDef.text}; white-space: pre-wrap; word-break: break-word; overflow-y: auto; max-height: 160px; padding: 2px 0;"
         title="Double-click to edit text"
       >${escapeHtml(s.text)}</div>
 
       <!-- Card Footer: Relative Time -->
-      <div class="sticky-card-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 6px; border-top: 1px dashed rgba(0,0,0,0.08); font-size: 10px; color: ${colorDef.text}; opacity: 0.65;">
+      <div class="sticky-card-footer">
         <span>${formatRelativeTime(s.createdAt)}</span>
-        <span class="sticky-drag-hint" style="opacity: 0.5; font-size: 9px;">⠿ drag</span>
+        <span class="sticky-drag-hint">⠿ drag</span>
       </div>
     </div>
   `;
@@ -486,8 +477,8 @@ function attachStickyEventListeners(container, stickies) {
             <div style="flex: 1;">
               <label class="form-label">Color</label>
               <select id="modal-edit-sticky-color" class="form-input">
-                ${Object.values(STICKY_COLORS).map(c => `
-                  <option value="${c.id}" ${targetSticky.color === c.id ? 'selected' : ''}>${c.name}</option>
+                ${STICKY_COLOR_IDS.map(id => `
+                  <option value="${id}" ${targetSticky.color === id ? 'selected' : ''}>${STICKY_COLOR_NAMES[id]}</option>
                 `).join('')}
               </select>
             </div>

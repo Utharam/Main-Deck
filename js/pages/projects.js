@@ -198,7 +198,7 @@ export async function render(container) {
         contentHtml: `
           <div class="form-group">
             <label class="form-label" for="add-step-name">Step Name</label>
-            <input type="text" id="add-step-name" placeholder="e.g. Phase ${existingPhases.length + 1}: Final Review" autofocus required />
+            <input type="text" id="add-step-name" placeholder="e.g. Phase ${existingPhases.length + 1}: Final Review" required />
           </div>
           <div class="form-group" style="margin-top: 12px;">
             <label class="form-label" for="add-step-note">Context Note (Optional)</label>

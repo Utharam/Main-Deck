@@ -109,7 +109,7 @@
   cursor: default;
 }
 
-[data-theme="dark"] .sidebar-brand-avatar {
+[data-theme="midnight-dark"], [data-theme="dark"] .sidebar-brand-avatar {
   background-color: #24352f;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
@@ -151,7 +151,7 @@
   -webkit-backdrop-filter: blur(4px);
 }
 
-[data-theme="dark"] .sidebar-brand-badge {
+[data-theme="midnight-dark"], [data-theme="dark"] .sidebar-brand-badge {
   background: rgba(255, 255, 255, 0.1);
   color: #7ee0b3;
 }
@@ -212,7 +212,7 @@
   border-color: transparent;
 }
 
-[data-theme="dark"] .nav-item.active {
+[data-theme="midnight-dark"], [data-theme="dark"] .nav-item.active {
   background-color: var(--color-bg-sidebar-active);
   color: var(--color-text-sidebar-active);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
@@ -449,7 +449,7 @@
   gap: var(--space-4);
 }
 
-[data-theme="dark"] .app-footer {
+[data-theme="midnight-dark"], [data-theme="dark"] .app-footer {
   background-color: rgba(24, 34, 31, 0.75);
 }
 
