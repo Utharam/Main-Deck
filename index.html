@@ -12,6 +12,8 @@
 
   <!-- PWA Manifest & Meta -->
   <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png">
   <meta name="theme-color" content="#0284c7">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -135,17 +137,12 @@
           </button>
         </div>
 
-        <!-- Header Actions: Guide, Weather, Live Clock -->
+        <!-- Header Actions: Guide, Live Clock -->
         <div class="header-actions">
           <button id="header-readme-btn" class="btn btn-sm btn-header-action" title="Main Deck Guide & Philosophy">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 1-4 4v14a3 3 0 0 0 3-3h7z"/></svg>
             <span>Guide</span>
           </button>
-
-          <!-- Weather Widget in Header -->
-          <div id="header-weather" class="header-weather-dock">
-            <!-- Injected via weather.js -->
-          </div>
 
           <span id="header-clock" class="header-clock">--:--</span>
         </div>

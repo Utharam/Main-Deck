@@ -357,24 +357,6 @@
   box-shadow: var(--shadow-sm);
 }
 
-.header-weather-dock {
-  display: flex;
-  align-items: center;
-  background-color: var(--color-bg-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-full);
-  padding: 5px 12px;
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  box-shadow: var(--shadow-xs);
-  transition: all var(--transition-fast);
-}
-
-.header-weather-dock:hover {
-  background-color: var(--color-bg-surface-hover);
-  border-color: var(--color-border-strong);
-}
-
 .header-clock {
   background-color: var(--color-bg-surface);
   border: 1px solid var(--color-border);

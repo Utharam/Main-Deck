@@ -25,7 +25,6 @@ import { widget as dayssinceWidget } from './widgets/dayssince.js';
 import { widget as photoframeWidget } from './widgets/photoframe.js';
 
 // Header & Footer Special Docks
-import { widget as weatherWidget } from './widgets/weather.js';
 import { widget as stressWidget } from './widgets/stress.js';
 import { widget as messagesWidget } from './widgets/messages.js';
 
@@ -139,42 +138,36 @@ async function init() {
     // 6. Start Live Clock in Header
     startHeaderClock();
 
-    // 7. Mount Header Weather Widget
-    const headerWeatherEl = document.getElementById('header-weather');
-    if (headerWeatherEl) {
-      await weatherWidget.render(headerWeatherEl);
-    }
-
-    // 8. Read Me Guide button listener
+    // 7. Read Me Guide button listener
     setupReadMeGuide();
 
-    // 9. Global Search shortcut (Ctrl+K or Header button)
+    // 8. Global Search shortcut (Ctrl+K or Header button)
     setupSearch();
 
-    // 10. Setup Router
+    // 9. Setup Router
     window.addEventListener('hashchange', handleRoute);
     handleRoute();
 
-    // 11. Render Right Rail Widgets
+    // 10. Render Right Rail Widgets
     await renderAllWidgets();
 
-    // 11b. Keep rail widgets + sticky countdowns in sync with the store
+    // 10b. Keep rail widgets + sticky countdowns in sync with the store
     setupDataChangeRefresh();
     setupExpiryTicker();
 
-    // 12. Mount Footer Stress Meter (Center)
+    // 11. Mount Footer Stress Meter (Center)
     const footerStressEl = document.getElementById('footer-stress-meter');
     if (footerStressEl) {
       await stressWidget.render(footerStressEl);
     }
 
-    // 13. Mount Footer Messages Widget (Left)
+    // 12. Mount Footer Messages Widget (Left)
     const footerMsgEl = document.getElementById('footer-quote-text');
     if (footerMsgEl) {
       await messagesWidget.render(footerMsgEl);
     }
 
-    // 14. Check Backup Banner
+    // 13. Check Backup Banner
     checkBackupPrompt();
 
   } catch (error) {
@@ -345,10 +338,10 @@ async function handleRoute() {
  * Render all registered widgets in the right rail.
  *
  * @param {object} [opts]
- * @param {boolean} [opts.includeDocks=true] Also re-render the header weather and
- *   footer stress docks. Pass false from the data-change refresh: the stress
- *   slider persists on every arrow keypress, so re-rendering it would destroy
- *   focus mid-adjustment, and rebuilding it during a pointer drag would swap the
+ * @param {boolean} [opts.includeDocks=true] Also re-render the footer stress
+ *   dock. Pass false from the data-change refresh: the stress slider persists
+ *   on every arrow keypress, so re-rendering it would destroy focus
+ *   mid-adjustment, and rebuilding it during a pointer drag would swap the
  *   element out from under the captured pointer.
  */
 export async function renderAllWidgets({ includeDocks = true } = {}) {
@@ -368,9 +361,6 @@ export async function renderAllWidgets({ includeDocks = true } = {}) {
   }
 
   if (!includeDocks) return;
-
-  const headerWeatherEl = document.getElementById('header-weather');
-  if (headerWeatherEl) await weatherWidget.render(headerWeatherEl);
 
   const footerStressEl = document.getElementById('footer-stress-meter');
   if (footerStressEl) await stressWidget.render(footerStressEl);

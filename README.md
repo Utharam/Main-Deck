@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-4.3.0-blueviolet.svg?style=flat-square" alt="Version 4.3.0">
+  <img src="https://img.shields.io/badge/Version-4.4.0-blueviolet.svg?style=flat-square" alt="Version 4.4.0">
   <img src="https://img.shields.io/badge/PWA-Installable-blue.svg?style=flat-square" alt="PWA Ready">
   <img src="https://img.shields.io/badge/Vanilla_JS-ES_Modules-yellow.svg?style=flat-square" alt="Vanilla JS">
   <img src="https://img.shields.io/badge/Storage-IndexedDB_(Local--First)-green.svg?style=flat-square" alt="IndexedDB">
@@ -87,7 +87,7 @@ Main Deck is a fully installable **PWA**:
 - 2-minute reset mini-games (*Swat Mosquito*, *Pop Balloons*, *Smash Distractions*, *Love Them*) with a gentle re-entry guard.
 
 ### ⚙️ Modular & Independent Settings
-- 4 separate, self-contained setting cards: **Preferences & Profile**, **Weather Location**, **Custom Quotes**, and **Local Storage & Portability** — each with independent save controls.
+- 3 separate, self-contained setting cards: **Preferences & Profile**, **Custom Quotes**, and **Local Storage & Portability** — each with independent save controls.
 
 ---
 

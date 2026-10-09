@@ -6,7 +6,7 @@
 // Bump on every deploy: the fetch handler is cache-first, so an unbumped
 // CACHE_NAME means the first page load after a release serves the previous
 // version's JS. Keep in sync with the version in package-less manual deploys.
-const CACHE_NAME = 'maindeck-v4.3.0';
+const CACHE_NAME = 'maindeck-v4.4.0';
 
 const APP_SHELL = [
   './',
@@ -36,7 +36,6 @@ const APP_SHELL = [
   './js/widgets/reminders.js',
   './js/widgets/dayssince.js',
   './js/widgets/photoframe.js',
-  './js/widgets/weather.js',
   './js/widgets/stress.js',
   './js/widgets/messages.js',
   './js/utils/export.js',
@@ -74,7 +73,7 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // Network-first for external API calls (weather, geocoding, etc.)
+  // Network-first for external API calls (e.g. future integrations)
   if (url.origin !== location.origin) {
     event.respondWith(
       fetch(event.request)
